@@ -1,20 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const FilterSection = ({ title, items, selectedFilters, filterKey, handleCheckboxChange }) => {
+const FilterSection = ({ title, items, filterKey, handleCheckboxChange, isItemSelected }) => {
   return (
     <div className="widget blockid_brand">
-      <h5 className="widget-title">By {title}</h5>
+      <h5 className="widget-title">{title}</h5>
       <div className="loke_scroll">
-        <ul className="nt_filter_block nt_filter_color css_ntbar">
-          {items.map((item, i) => (
-            <li key={i}>
-              <label className='sidebar-filter'>
+        <ul className="nt_filter_block css_ntbar">
+          {items.map((item) => (
+            <li key={item}>
+              <label className="sidebar-filter">
                 <input
                   type="checkbox"
-                  checked={selectedFilters[filterKey]?.includes(item)}
+                  checked={isItemSelected(item)}
                   onChange={() => handleCheckboxChange(filterKey, item)}
                 />
-                {item}
+                <span>{item}</span>
               </label>
             </li>
           ))}
@@ -24,4 +25,12 @@ const FilterSection = ({ title, items, selectedFilters, filterKey, handleCheckbo
   );
 };
 
-export default FilterSection;
+FilterSection.propTypes = {
+  title: PropTypes.string.isRequired,
+  items: PropTypes.array.isRequired,
+  filterKey: PropTypes.string.isRequired,
+  handleCheckboxChange: PropTypes.func.isRequired,
+  isItemSelected: PropTypes.func.isRequired
+};
+
+export default React.memo(FilterSection);
