@@ -22,7 +22,7 @@ const Collection = ({ sort }) => {
     });
     const [popUpData, setPopUpData] = useState("")
     const [showPopUp, setShowPopUp] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
+
 
     const lastFiltersRef = React.useRef({});
     useEffect(() => {
@@ -179,14 +179,14 @@ const Collection = ({ sort }) => {
                                                 onClick={() => handleImageClick(product)}
                                             >
                                                 <LazyLoadImage
-                                                    src={product.imageUrl}
+                                                    src={product.imageUrl || null}
                                                     alt={product.name}
                                                     className="main-img"
                                                     effect="blur"
                                                     style={{ height: "403px" }}
                                                 />
                                                 <img
-                                                    src={product.images?.[1]?.url || product.imageUrl}
+                                                    src={product.images?.[1]?.url || product.imageUrl || null}
                                                     alt={product.name}
                                                     className="hover-img"
                                                     style={{ height: "403px" }}
@@ -198,9 +198,9 @@ const Collection = ({ sort }) => {
                                                     <i className="fa-regular fa-heart" />
                                                 </a>
                                             </div>
-                                            <div class="hover_button op__0 tc pa flex column ts__03 des_btns_pr_1 has_sizelistt4_true">
-                                                <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com","//trendia.co")} data-id={product.productId} class="pr pr_atc cd br__40 bgw tc dib js__qs cb chp ttip_nt tooltip_top_left" rel="nofollow">
-                                                    <span class="tt_txt">Quick Shop</span>
+                                            <div className="hover_button op__0 tc pa flex column ts__03 des_btns_pr_1 has_sizelistt4_true">
+                                                <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com","//trendia.co")} data-id={product.productId} className="pr pr_atc cd br__40 bgw tc dib js__qs cb chp ttip_nt tooltip_top_left" rel="nofollow">
+                                                    <span className="tt_txt">Quick Shop</span>
                                                     <i className="fa-solid fa-cart-shopping" />
                                                     <span>Quick Shop</span>
                                                 </a>

@@ -9,7 +9,13 @@ import "./index.css"
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename="pages/test-filter">
+      <BrowserRouter
+      basename="pages/test-filter"
+      future={{
+        v7_relativeSplatPath: true,
+        v7_startTransition: true
+      }}
+    >
       <Routes>
         <Route path="/*" element={<App />} />
       </Routes>

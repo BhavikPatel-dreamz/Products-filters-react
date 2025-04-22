@@ -101,8 +101,9 @@ const Sidebar = () => {
         updatedParams.delete(key);
       }
     });
-
-    navigate(`?${updatedParams.toString()}`, { replace: true });
+    setTimeout(() => {
+      navigate(`?${updatedParams.toString()}`, { replace: true });
+    }, 0);
   };
   const filterConfigs = [
     { title: "Gender", items: gender, filterKey: "gender" },
