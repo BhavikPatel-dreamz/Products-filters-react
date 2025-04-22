@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import axiosInstance from "../axiosinstance";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
@@ -9,6 +9,12 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 
 
 const Collection = ({ sort }) => {
+    const collectionElement = document.getElementById("collection");
+    const name = collectionElement?.dataset?.collection;
+    const itemsPerPage = collectionElement?.dataset?.itemsPerPage;
+    const Pagination = collectionElement?.dataset?.showPagination
+
+
     const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -17,40 +23,42 @@ const Collection = ({ sort }) => {
     const [paginationData, setPaginationData] = useState({
         total: 0,
         page: Number(searchParams.get("page")) || 1,
-        limit: 20,
+        limit: itemsPerPage,
         pages: 1,
     });
     const [popUpData, setPopUpData] = useState("")
     const [showPopUp, setShowPopUp] = useState(false);
-
+    const [collectionName, setCollectionName] = useState(name);
+    const [showPagination , setShowPagination] = useState(null)
 
     const lastFiltersRef = React.useRef({});
+
     useEffect(() => {
         document.body.classList.toggle("no-scroll", showPopUp);
         return () => document.body.classList.remove("no-scroll");
     }, [showPopUp]);
 
-    const [collectionName, setCollectionName] = useState("");
-
     useEffect(() => {
-        const collectionElement = document.getElementById('collection');
-        if (collectionElement?.dataset?.collection) {
-            setCollectionName(collectionElement.dataset.collection);
-        }
-    }, []);
-
+        
+        setShowPagination(Pagination === "true");
+ 
+      }, []);
 
     const navigate = useNavigate();
 
-    const filters = {};
-    for (const [key, value] of searchParams.entries()) {
-        filters[key] = value.includes(",") ? value.split(",") : value;
-    }
-    if (collectionName) {
-        filters.collection = collectionName;
-    }
+    const filters = useMemo(() => {
+        const baseFilters = {};
+        for (const [key, value] of searchParams.entries()) {
+            baseFilters[key] = value.includes(",") ? value.split(",") : value;
+        }
+        if (collectionName) {
+            baseFilters.collections = collectionName;
+        }
+        return baseFilters;
+    }, [searchParams, collectionName]);
 
     useEffect(() => {
+        if (!collectionName) return;
         const currentFilters = { ...filters };
         delete currentFilters.page;
 
@@ -59,12 +67,12 @@ const Collection = ({ sort }) => {
 
         if (filtersChanged) {
             lastFiltersRef.current = currentFilters;
-
             const newParams = new URLSearchParams(searchParams.toString());
             newParams.set("page", "1");
             navigate(`?${newParams.toString()}`, { replace: true });
         }
-    }, [searchParams.toString(), collectionName]);
+
+    }, [filters, collectionName]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -77,10 +85,11 @@ const Collection = ({ sort }) => {
             Object.entries(filters).forEach(([key, value]) => {
                 queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
             });
-
             queryParams.set("page", urlPage);
             queryParams.set("limit", paginationData.limit);
+            queryParams.set("collections", collectionName);
             if (sort) queryParams.set("sort", sort);
+
 
             const response = await axiosInstance.get(`/products?${queryParams.toString()}`);
             if (response.data?.data) {
@@ -88,7 +97,9 @@ const Collection = ({ sort }) => {
                 setPaginationData((prev) => ({
                     ...prev,
                     ...response.data.data.pagination,
+
                     page: urlPage, // update to keep in sync
+                    limit: prev.limit
                 }));
             }
         } catch (err) {
@@ -101,8 +112,8 @@ const Collection = ({ sort }) => {
 
     useEffect(() => {
         fetchData();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [searchParams.toString(),sort]);
+
+    }, [searchParams.toString(), sort, collectionName]);
 
     const getPaginationNumbers = () => {
         const { pages, page } = paginationData;
@@ -156,7 +167,7 @@ const Collection = ({ sort }) => {
                 ) : !loading && products.length === 0 ? (
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
-                    products.map((product, i) => 
+                    products.map((product, i) =>
                     (
                         <div key={i} className="sidebar-box-content-col col-lg-3 col-md-3 col-6 pr_animated done mt__30 pr_loop_11 pr_grid_item product nt_pr desgin__1">
                             <div className="product-inner pr">
@@ -199,7 +210,7 @@ const Collection = ({ sort }) => {
                                                 </a>
                                             </div>
                                             <div className="hover_button op__0 tc pa flex column ts__03 des_btns_pr_1 has_sizelistt4_true">
-                                                <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com","//trendia.co")} data-id={product.productId} className="pr pr_atc cd br__40 bgw tc dib js__qs cb chp ttip_nt tooltip_top_left" rel="nofollow">
+                                                <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")} data-id={product.productId} className="pr pr_atc cd br__40 bgw tc dib js__qs cb chp ttip_nt tooltip_top_left" rel="nofollow">
                                                     <span className="tt_txt">Quick Shop</span>
                                                     <i className="fa-solid fa-cart-shopping" />
                                                     <span>Quick Shop</span>
@@ -250,7 +261,7 @@ const Collection = ({ sort }) => {
                     ))
                 )}
             </div>
-            {paginationData.pages > 1 && (
+            {showPagination && paginationData.pages > 1 && (
                 <div className="pagination">
                     <button
                         disabled={paginationData.page === 1}
@@ -278,9 +289,10 @@ const Collection = ({ sort }) => {
                     >
                         Next
                     </button>
-
                 </div>
             )}
+
+
             {
                 showPopUp &&
                 <div className="trendia-popup-overlay">

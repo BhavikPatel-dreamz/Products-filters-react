@@ -12,6 +12,7 @@ const Sidebar = () => {
   const [gender, setGender] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [loading, setLoading] = useState(true);
+  const [enabledFilterConfigs, setEnabledFilterConfigs] = useState([]);
 
 
   const navigate = useNavigate();
@@ -27,6 +28,43 @@ const Sidebar = () => {
     }
     return result;
   }, [searchParams]);
+
+  useEffect(() => {
+    const collectionElement = document.getElementById("collection");
+    const enabledFilters = collectionElement?.dataset?.enabledFilters;
+    const filterOrder = collectionElement?.dataset?.filterOrder;
+  
+
+    if (enabledFilters) {
+      const enabledKeys = enabledFilters.split(",").map(item => item.trim());
+      const orderKeys = filterOrder
+        ? filterOrder.split(",").map(item => item.trim())
+        : [];
+
+      const filterConfigs = [
+        { title: "Gender", items: gender, filterKey: "gender" },
+        { title: "Group", items: productGroup, filterKey: "productGroup" },
+        { title: "Type", items: productTypes, filterKey: "productType" },
+        { title: "Color", items: colors, filterKey: "color" },
+        { title: "Brand", items: productBrand, filterKey: "brand" },
+        { title: "Material", items: productMaterial, filterKey: "material" },
+      ];
+
+      // 1. Filter only enabled filters
+      const filteredConfigs = filterConfigs.filter(config =>
+        enabledKeys.includes(config.filterKey)
+      );
+
+      // 2. Sort based on filterOrder (if provided)
+      const sortedConfigs = orderKeys.length
+        ? filteredConfigs.sort((a, b) =>
+          orderKeys.indexOf(a.filterKey) - orderKeys.indexOf(b.filterKey)
+        )
+        : filteredConfigs;
+
+      setEnabledFilterConfigs(sortedConfigs);
+    }
+  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial]);
 
 
   useEffect(() => {
@@ -105,17 +143,12 @@ const Sidebar = () => {
       navigate(`?${updatedParams.toString()}`, { replace: true });
     }, 0);
   };
-  const filterConfigs = [
-    { title: "Gender", items: gender, filterKey: "gender" },
-    { title: "Group", items: productGroup, filterKey: "productGroup" },
-    { title: "Type", items: productTypes, filterKey: "productType" },
-    { title: "Color", items: colors, filterKey: "color" },
-    { title: "Brand", items: productBrand, filterKey: "brand" },
-    { title: "Material", items: productMaterial, filterKey: "material" },
-  ];
+
+
+
   const renderSkeleton = () => (
     <>
-      {filterConfigs.map(({ title, filterKey }) => (
+      {enabledFilterConfigs.map(({ title, filterKey }) => (
         <div key={filterKey} className="filter-section-skeleton mb__20 widget widget_filter">
           <div className="widget-title flex justify-between items-center">
             <span className="skeleton-box title-skeleton" />
@@ -155,7 +188,7 @@ const Sidebar = () => {
             renderSkeleton()
           ) : (
             <>
-              {filterConfigs.map(({ title, items, filterKey }) =>
+              {enabledFilterConfigs.map(({ title, items, filterKey }) =>
                 items.length > 0 && (
                   <FilterSection
                     key={filterKey}
