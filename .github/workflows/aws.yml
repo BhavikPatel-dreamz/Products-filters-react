@@ -48,7 +48,7 @@ jobs:
 
             LIVE_DIR="/var/www/html/react"
             TEMP_DIR="/home/ubuntu/reacttemp"
-
+            
             echo "Loading environment..."
             source ~/.bashrc || true
             source ~/.nvm/nvm.sh || true
