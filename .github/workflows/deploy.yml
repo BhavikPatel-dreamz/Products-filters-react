@@ -16,12 +16,17 @@ jobs:
       - name: Setup Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: '18.20'
+          node-version: '20'
+
+      - name: Install Yarn
+        run: |
+          npm install -g yarn
+
+      - name: Install Dependencies with Yarn
+        run: yarn install
 
       - name: Build React App
-        run: |
-          npm ci
-          npm run build
+        run: yarn build
 
       - name: Zip Build Directory
         run: zip -r build.zip build -x "*.git*" "*.github/*"
