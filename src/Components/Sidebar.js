@@ -13,6 +13,9 @@ const Sidebar = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [loading, setLoading] = useState(true);
   const [enabledFilterConfigs, setEnabledFilterConfigs] = useState([]);
+  const [work ,setWork] = useState([]);
+  const [size ,setSize] = useState([]);
+  const [fabrics, setFabrics] = useState([]);
 
 
   const navigate = useNavigate();
@@ -48,6 +51,9 @@ const Sidebar = () => {
         { title: "Color", items: colors, filterKey: "color" },
         { title: "Brand", items: productBrand, filterKey: "brand" },
         { title: "Material", items: productMaterial, filterKey: "material" },
+        { title: "Fabrics" , items: fabrics , filterKey: "fabrics" },
+        { title: "Works" , items: work , filterKey: "works" },
+        { title: "Size" , items: size , filterKey: "sizes" }
       ];
 
       // 1. Filter only enabled filters
@@ -85,6 +91,9 @@ const Sidebar = () => {
         setProductMaterial(response.data.data.attributes.materials);
         setProductGroup(response.data.data.productGroups);
         setGender(response.data.data.attributes.genders);
+        setFabrics(response.data.data.attributes.fabrics);
+        setWork(response.data.data.attributes.works)
+        setSize(response.data.data.attributes.sizes)
 
       } catch (err) {
         console.error("Failed to fetch filters:", err);
@@ -104,6 +113,9 @@ const Sidebar = () => {
       brand: filters.brand ? (Array.isArray(filters.brand) ? filters.brand : [filters.brand]) : [],
       material: filters.material ? (Array.isArray(filters.material) ? filters.material : [filters.material]) : [],
       productGroup: filters.productGroup ? (Array.isArray(filters.productGroup) ? filters.productGroup : [filters.productGroup]) : [],
+      fabrics: filters.fabrics ? (Array.isArray(filters.fabrics) ? filters.fabrics : [filters.fabrics]) : [],
+      works: filters.works ? (Array.isArray(filters.works) ? filters.works : [filters.works]) : [],
+      sizes: filters.sizes ? (Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes]) : [],
     });
   }, [filters]);
 
