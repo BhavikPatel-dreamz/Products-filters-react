@@ -13,10 +13,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
@@ -47,6 +48,10 @@ jobs:
 
             LIVE_DIR="/var/www/html/react"
             TEMP_DIR="/home/ubuntu/reacttemp"
+
+            echo "Loading environment..."
+            source ~/.bashrc || true
+            source ~/.nvm/nvm.sh || true
 
             echo "Cleaning temp directory..."
             sudo rm -rf $TEMP_DIR
