@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '18.20'
 
       - name: Build React App
         run: |
