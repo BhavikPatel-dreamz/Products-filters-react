@@ -5,75 +5,93 @@ import axios from "axios";
 import parse from "html-react-parser";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-
-
+import PaginationComponent from "./pagination"; // Renamed to avoid conflict
 
 const Collection = ({ sort }) => {
     const collectionElement = document.getElementById("collection");
     const name = collectionElement?.dataset?.collection;
     const itemsPerPage = collectionElement?.dataset?.itemsPerPage;
-    const Pagination = collectionElement?.dataset?.showPagination
+    const showPaginationAttr = collectionElement?.dataset?.showPagination;
 
-
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const urlPage = Number(searchParams.get("page") || 1);
+    const urlPage = Number(searchParams.get("page")) || 1; 
+   
     const [paginationData, setPaginationData] = useState({
         total: 0,
-        page: Number(searchParams.get("page")) || 1,
+        page: urlPage,
         limit: itemsPerPage,
         pages: 1,
     });
-    const [popUpData, setPopUpData] = useState("")
-    const [showPopUp, setShowPopUp] = useState(false);
+    
     const [collectionName, setCollectionName] = useState(name);
-    const [showPagination , setShowPagination] = useState(null)
+    const [showPagination, setShowPagination] = useState(false);
 
-    const lastFiltersRef = React.useRef({});
-
-    useEffect(() => {
-        document.body.classList.toggle("no-scroll", showPopUp);
-        return () => document.body.classList.remove("no-scroll");
-    }, [showPopUp]);
+    const lastFiltersRef = useRef({});
+    const initialRenderRef = useRef(true);
 
     useEffect(() => {
-        
-        setShowPagination(Pagination === "true");
- 
-      }, []);
+        setShowPagination(showPaginationAttr === "true");
+    }, [showPaginationAttr]);
 
     const navigate = useNavigate();
 
     const filters = useMemo(() => {
         const baseFilters = {};
         for (const [key, value] of searchParams.entries()) {
-            baseFilters[key] = value.includes(",") ? value.split(",") : value;
+            if (key !== "page") {
+                baseFilters[key] = value.includes(",") ? value.split(",") : value;
+            }
         }
         if (collectionName) {
             baseFilters.collections = collectionName;
         }
         return baseFilters;
     }, [searchParams, collectionName]);
+    
 
     useEffect(() => {
         if (!collectionName) return;
+        if (initialRenderRef.current) {
+            initialRenderRef.current = false;
+            
+            if (!searchParams.has("page")) {
+                const newParams = new URLSearchParams(searchParams.toString());
+                newParams.set("page", "1");
+                navigate(`?${newParams.toString()}`, { replace: true });
+                return;
+            }
+        }
+    
         const currentFilters = { ...filters };
-        delete currentFilters.page;
+        const prevFilters = { ...lastFiltersRef.current };
 
-        const prevFilters = lastFiltersRef.current;
+        delete currentFilters.collections;
+        delete prevFilters.collections;
+        
         const filtersChanged = JSON.stringify(prevFilters) !== JSON.stringify(currentFilters);
-
+    
         if (filtersChanged) {
-            lastFiltersRef.current = currentFilters;
+        
+            lastFiltersRef.current = { ...filters };
+            
+          
             const newParams = new URLSearchParams(searchParams.toString());
             newParams.set("page", "1");
             navigate(`?${newParams.toString()}`, { replace: true });
         }
-
-    }, [filters, collectionName]);
-
+    }, [filters, navigate, searchParams, collectionName]);
+    
+  
+    useEffect(() => {
+        setPaginationData(prev => ({
+            ...prev,
+            page: urlPage
+        }));
+    }, [urlPage]);
+    
     const fetchData = async () => {
         setLoading(true);
         setError(null);
@@ -85,11 +103,12 @@ const Collection = ({ sort }) => {
             Object.entries(filters).forEach(([key, value]) => {
                 queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
             });
-            queryParams.set("page", urlPage);
+            
+            // Ensure page and limit are included
+            queryParams.set("page", urlPage.toString());
             queryParams.set("limit", paginationData.limit);
             queryParams.set("collections", collectionName);
             if (sort) queryParams.set("sort", sort);
-
 
             const response = await axiosInstance.get(`/products?${queryParams.toString()}`);
             if (response.data?.data) {
@@ -97,8 +116,7 @@ const Collection = ({ sort }) => {
                 setPaginationData((prev) => ({
                     ...prev,
                     ...response.data.data.pagination,
-
-                    page: urlPage, // update to keep in sync
+                    page: urlPage,
                     limit: prev.limit
                 }));
             }
@@ -111,49 +129,20 @@ const Collection = ({ sort }) => {
     };
 
     useEffect(() => {
-        fetchData();
-
-    }, [searchParams.toString(), sort, collectionName]);
-
-    const getPaginationNumbers = () => {
-        const { pages, page } = paginationData;
-        const pageNumbers = [];
-
-        if (pages <= 5) {
-            for (let i = 1; i <= pages; i++) pageNumbers.push(i);
-        } else {
-            if (page <= 3) {
-                pageNumbers.push(1, 2, 3, "...", pages);
-            } else if (page >= pages - 2) {
-                pageNumbers.push(1, "...", pages - 2, pages - 1, pages);
-            } else {
-                pageNumbers.push(1, "...", page - 1, page, page + 1, "...", pages);
-            }
+        if (collectionName) {
+            fetchData();
         }
-        return pageNumbers;
-    };
+    }, [searchParams.toString(), sort, collectionName, urlPage]);
 
     const handleImageClick = (product) => {
         window.location.href = `${product.productUrl}`;
     };
+
     const changePage = (newPage) => {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set("page", newPage.toString());
         navigate(`?${newParams.toString()}`, { replace: true });
     };
-
-    // const handleCart = async (product) => {
-    //     try {
-    //         const targetUrl = `${product.productUrl}?view=quick_shop`;
-    //         const response = await axios.get(targetUrl);
-    //         console.log(response.data,"res")
-    //         setPopUpData(response.data);
-
-    //     } catch (error) {
-    //         console.error("Error fetching quick shop content:", error);
-    //     }
-    //     setShowPopUp(true)
-    // };
 
     return (
         <div id="shopify-section-collection_page" className="shopify-section tp_se_cdt">
@@ -261,50 +250,14 @@ const Collection = ({ sort }) => {
                     ))
                 )}
             </div>
+
             {showPagination && paginationData.pages > 1 && (
-                <div className="pagination">
-                    <button
-                        disabled={paginationData.page === 1}
-                        onClick={() => changePage(paginationData.page - 1)}
-                        className="pagination-button"
-                    >
-                        Prev
-                    </button>
-
-                    {getPaginationNumbers().map((page, index) => (
-                        <button
-                            key={index}
-                            onClick={() => typeof page === "number" && changePage(page)}
-                            className={`pagination-button ${paginationData.page === page ? "active" : ""}`}
-                            disabled={page === "..."}
-                        >
-                            {page}
-                        </button>
-                    ))}
-
-                    <button
-                        disabled={paginationData.page === paginationData.pages}
-                        onClick={() => changePage(paginationData.page + 1)}
-                        className="pagination-button"
-                    >
-                        Next
-                    </button>
-                </div>
+                <PaginationComponent
+                    currentPage={paginationData.page}
+                    totalPages={paginationData.pages}
+                    onPageChange={changePage}
+                />
             )}
-
-
-            {
-                showPopUp &&
-                <div className="trendia-popup-overlay">
-                    <div className="trendia-popup">
-                        <div className="trendia-popup__header">
-                            <div>{parse(popUpData)}</div>
-                            <button className="trendia-popup__close-btn" onClick={() => setShowPopUp(false)}>&times;</button>
-                        </div>
-                    </div>
-                </div>
-            }
-
         </div>
     );
 };

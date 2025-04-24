@@ -29,6 +29,7 @@ const Sidebar = () => {
     for (const [key, value] of searchParams.entries()) {
       result[key] = value.includes(",") ? value.split(",") : value;
     }
+
     return result;
   }, [searchParams]);
 
@@ -128,7 +129,6 @@ const Sidebar = () => {
       } else {
         updatedCategory.push(value);
       }
-
       const newFilters = { ...prev, [category]: updatedCategory };
       updateFilters(newFilters);
       return newFilters;
@@ -175,20 +175,6 @@ const Sidebar = () => {
           </div>
         </div>
       ))}
-
-      <div className="widget blockid_brand">
-        <h5 className="widget-title">
-          <span className="skeleton-box title-skeleton" />
-        </h5>
-        <div className="price-slider-container" style={{ position: "relative", width: "200px" }}>
-          <div className="skeleton-slider-track" />
-          <div className="skeleton-slider-thumb left" />
-          <div className="skeleton-slider-thumb right" />
-        </div>
-        <div className="price-values">
-          <span className="skeleton-box price-label" /> - <span className="skeleton-box price-label" />
-        </div>
-      </div>
     </>
   );
 
