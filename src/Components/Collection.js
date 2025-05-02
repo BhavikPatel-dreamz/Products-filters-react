@@ -1,43 +1,40 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axiosInstance from "../axiosinstance";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import axios from "axios";
-import parse from "html-react-parser";
-import PaginationComponent from "./pagination"; // Renamed to avoid conflict
-import ProductItem from "./ProductItem"; // Import the new ProductItem component
-import LoadingSkeleton from "./LoadingSkeleton"; // Import the loading skeleton component
+import { useNavigate, useSearchParams } from "react-router-dom";
+import PaginationComponent from "./pagination";
+import ProductItem from "./ProductItem";
+import LoadingSkeleton from "./LoadingSkeleton";
 
 const Collection = ({ sort }) => {
     const collectionElement = document.getElementById("collection");
     const name = collectionElement?.dataset?.collection;
     const itemsPerPage = collectionElement?.dataset?.itemsPerPage;
-    const showPaginationAttr = collectionElement?.dataset?.showPagination;
+    const showPaginationAttr = collectionElement?.dataset?.showPagination ?? "true";
 
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const urlPage = Number(searchParams.get("page")) || 1; 
-   
+    const urlPage = Number(searchParams.get("page")) || 1;
+
     const [paginationData, setPaginationData] = useState({
         total: 0,
         page: urlPage,
-        limit: itemsPerPage,
+        limit: itemsPerPage || 20,
         pages: 1,
     });
-    
-    const [collectionName, setCollectionName] = useState(name);
+
     const [showPagination, setShowPagination] = useState(false);
 
     const lastFiltersRef = useRef({});
     const initialRenderRef = useRef(true);
+    const lastFetchParamsRef = useRef(null);
 
     useEffect(() => {
         setShowPagination(showPaginationAttr === "true");
     }, [showPaginationAttr]);
 
     const navigate = useNavigate();
-
+    const collectionName = useMemo(() => name, [name]);
     const filters = useMemo(() => {
         const baseFilters = {};
         for (const [key, value] of searchParams.entries()) {
@@ -45,18 +42,17 @@ const Collection = ({ sort }) => {
                 baseFilters[key] = value.includes(",") ? value.split(",") : value;
             }
         }
+        // Only add collection filter if collectionName is provided
         if (collectionName) {
             baseFilters.collections = collectionName;
         }
         return baseFilters;
     }, [searchParams, collectionName]);
-    
 
     useEffect(() => {
-        if (!collectionName) return;
         if (initialRenderRef.current) {
             initialRenderRef.current = false;
-            
+
             if (!searchParams.has("page")) {
                 const newParams = new URLSearchParams(searchParams.toString());
                 newParams.set("page", "1");
@@ -64,54 +60,55 @@ const Collection = ({ sort }) => {
                 return;
             }
         }
-    
+
         const currentFilters = { ...filters };
         const prevFilters = { ...lastFiltersRef.current };
 
         delete currentFilters.collections;
         delete prevFilters.collections;
-        
+
         const filtersChanged = JSON.stringify(prevFilters) !== JSON.stringify(currentFilters);
-    
+
         if (filtersChanged) {
             lastFiltersRef.current = { ...filters };
-            
+
             const newParams = new URLSearchParams(searchParams.toString());
             newParams.set("page", "1");
             navigate(`?${newParams.toString()}`, { replace: true });
         }
     }, [filters, navigate, searchParams, collectionName]);
-    
-  
+
     useEffect(() => {
         setPaginationData(prev => ({
             ...prev,
             page: urlPage
         }));
     }, [urlPage]);
-    
-    const fetchData = async () => {
-        setLoading(true);
-        setError(null);
-        setProducts([]);
 
-        try {
-            const queryParams = new URLSearchParams();
-
-            Object.entries(filters).forEach(([key, value]) => {
-                queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
-            });
-            
-            // Ensure page and limit are included
-            queryParams.set("page", urlPage.toString());
-            queryParams.set("limit", paginationData.limit);
+    const fetchData = useCallback(async () => {
+        const queryParams = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+            queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
+        });
+        queryParams.set("page", urlPage.toString());
+        queryParams.set("limit", paginationData.limit);
+        if (sort) queryParams.set("sort", sort);
+        if (collectionName) {
             queryParams.set("collections", collectionName);
-            if (sort) queryParams.set("sort", sort);
-
-            const response = await axiosInstance.get(`/products?${queryParams.toString()}`);
+        }
+    
+        const queryString = queryParams.toString();
+        if (lastFetchParamsRef.current === queryString) return;
+        lastFetchParamsRef.current = queryString;
+    
+        setLoading(true);
+        setProducts([]);
+    
+        try {
+            const response = await axiosInstance.get(`/products?${queryString}`);
             if (response.data?.data) {
                 setProducts(response.data.data.products || []);
-                setPaginationData((prev) => ({
+                setPaginationData(prev => ({
                     ...prev,
                     ...response.data.data.pagination,
                     page: urlPage,
@@ -120,19 +117,17 @@ const Collection = ({ sort }) => {
             }
         } catch (err) {
             console.error("Error fetching products:", err);
-            setError("Failed to fetch products.");
         } finally {
             setLoading(false);
         }
-    };
+    }, [filters, urlPage, sort, collectionName, paginationData.limit]);
+    
 
+    // Create a dependency string for the fetch effect
     useEffect(() => {
-        if (collectionName) {
-            fetchData();
-        }
-    }, [searchParams.toString(), sort, collectionName, urlPage]);
-
-   
+        fetchData();
+    }, [fetchData]);
+    
 
     const changePage = (newPage) => {
         const newParams = new URLSearchParams(searchParams.toString());
@@ -140,7 +135,6 @@ const Collection = ({ sort }) => {
         navigate(`?${newParams.toString()}`, { replace: true });
     };
 
-    // Render loading skeletons
     const renderLoadingSkeletons = () => {
         return Array.from({ length: paginationData.limit }).map((_, i) => (
             <LoadingSkeleton key={i} />
@@ -156,16 +150,15 @@ const Collection = ({ sort }) => {
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
                     products.map((product, i) => (
-                        <ProductItem 
-                            key={i} 
+                        <ProductItem
+                            key={i}
                             product={product}
-                           
                         />
                     ))
                 )}
             </div>
 
-            {showPagination && paginationData.pages > 1 && (
+            {showPagination && paginationData.pages > 1 &&  (
                 <PaginationComponent
                     currentPage={paginationData.page}
                     totalPages={paginationData.pages}

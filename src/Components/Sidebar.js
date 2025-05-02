@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosinstance";
 import FilterSection from "./Filtersidebar";
@@ -13,8 +13,8 @@ const Sidebar = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [loading, setLoading] = useState(true);
   const [enabledFilterConfigs, setEnabledFilterConfigs] = useState([]);
-  const [work ,setWork] = useState([]);
-  const [size ,setSize] = useState([]);
+  const [work, setWork] = useState([]);
+  const [size, setSize] = useState([]);
   const [fabrics, setFabrics] = useState([]);
 
 
@@ -22,88 +22,101 @@ const Sidebar = () => {
   const [searchParams] = useSearchParams();
 
   const location = useLocation();
-
+  const fetchOnceRef = useRef(false);
 
   const filters = useMemo(() => {
     const result = {};
     for (const [key, value] of searchParams.entries()) {
       result[key] = value.includes(",") ? value.split(",") : value;
     }
-
     return result;
   }, [searchParams]);
 
+
   useEffect(() => {
     const collectionElement = document.getElementById("collection");
+  
     const enabledFilters = collectionElement?.dataset?.enabledFilters;
     const filterOrder = collectionElement?.dataset?.filterOrder;
   
-
+    const filterConfigs = [
+      { title: "Gender", items: gender, filterKey: "gender" },
+      { title: "Group", items: productGroup, filterKey: "productGroup" },
+      { title: "Type", items: productTypes, filterKey: "productType" },
+      { title: "Color", items: colors, filterKey: "color" },
+      { title: "Brand", items: productBrand, filterKey: "brand" },
+      { title: "Material", items: productMaterial, filterKey: "material" },
+      { title: "Fabrics", items: fabrics, filterKey: "fabrics" },
+      { title: "Works", items: work, filterKey: "works" },
+      { title: "Size", items: size, filterKey: "sizes" }
+    ];
+  
+    let filteredConfigs = filterConfigs;
+  
     if (enabledFilters) {
       const enabledKeys = enabledFilters.split(",").map(item => item.trim());
-      const orderKeys = filterOrder
-        ? filterOrder.split(",").map(item => item.trim())
-        : [];
-
-      const filterConfigs = [
-        { title: "Gender", items: gender, filterKey: "gender" },
-        { title: "Group", items: productGroup, filterKey: "productGroup" },
-        { title: "Type", items: productTypes, filterKey: "productType" },
-        { title: "Color", items: colors, filterKey: "color" },
-        { title: "Brand", items: productBrand, filterKey: "brand" },
-        { title: "Material", items: productMaterial, filterKey: "material" },
-        { title: "Fabrics" , items: fabrics , filterKey: "fabrics" },
-        { title: "Works" , items: work , filterKey: "works" },
-        { title: "Size" , items: size , filterKey: "sizes" }
-      ];
-
-      // 1. Filter only enabled filters
-      const filteredConfigs = filterConfigs.filter(config =>
+  
+      filteredConfigs = filterConfigs.filter(config =>
         enabledKeys.includes(config.filterKey)
       );
-
-      // 2. Sort based on filterOrder (if provided)
-      const sortedConfigs = orderKeys.length
-        ? filteredConfigs.sort((a, b) =>
-          orderKeys.indexOf(a.filterKey) - orderKeys.indexOf(b.filterKey)
-        )
-        : filteredConfigs;
-
-      setEnabledFilterConfigs(sortedConfigs);
     }
-  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial]);
+  
+    // Apply ordering if provided and valid
+    if (filterOrder) {
+      const orderKeys = filterOrder.split(",").map(item => item.trim());
+  
+      filteredConfigs = [...filteredConfigs].sort((a, b) =>
+        orderKeys.indexOf(a.filterKey) - orderKeys.indexOf(b.filterKey)
+      );
+    }
+  
+    setEnabledFilterConfigs(filteredConfigs);
+  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
+  
+
 
 
   useEffect(() => {
+    if (fetchOnceRef.current) return; // Prevent second call
+    fetchOnceRef.current = true;
+  
     const fetchFilters = async () => {
       try {
         setLoading(true);
-
         const queryParams = new URLSearchParams();
+  
         Object.entries(filters).forEach(([key, value]) => {
           queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
         });
+  
+        const collectionElement = document.getElementById("collection");
+        const collectionName = collectionElement?.dataset?.collection;
+        if (collectionName) {
+          queryParams.set("collections", collectionName);
+        }
+  
         const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
-        const priceData = response.data.data.priceRange;
-
-        setColors(response.data.data.attributes.colors);
-        setProductTypes(response.data.data.productTypes);
-        setProductBrand(response.data.data.brands);
-        setProductMaterial(response.data.data.attributes.materials);
-        setProductGroup(response.data.data.productGroups);
-        setGender(response.data.data.attributes.genders);
-        setFabrics(response.data.data.attributes.fabrics);
-        setWork(response.data.data.attributes.works)
-        setSize(response.data.data.attributes.sizes)
-
+        const data = response.data.data;
+  
+        setColors(data.attributes.colors);
+        setProductTypes(data.productTypes);
+        setProductBrand(data.brands);
+        setProductMaterial(data.attributes.materials);
+        setProductGroup(data.productGroups);
+        setGender(data.attributes.genders);
+        setFabrics(data.attributes.fabrics);
+        setWork(data.attributes.works);
+        setSize(data.attributes.sizes);
       } catch (err) {
         console.error("Failed to fetch filters:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchFilters();
+  
+    fetchFilters(); // ✅ Now guaranteed to run only once
   }, [filters]);
+
 
 
   useEffect(() => {

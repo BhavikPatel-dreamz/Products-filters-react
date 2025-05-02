@@ -2,7 +2,7 @@ import React from 'react'
 
 const Header = () => {
   const collectionElement = document.getElementById("collection");
-  const title = collectionElement?.dataset?.title;
+  const title = collectionElement?.dataset?.title || collectionElement?.dataset?.collection;
 
   return (
     <div>

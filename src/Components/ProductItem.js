@@ -9,6 +9,18 @@ const ProductItem = ({ product }) => {
         window.location.href = `${product.productUrl}`;
     };
 
+    function get_currency(price) {
+      const rate = window.Shopify?.currency?.rate || 1;
+      const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;
+    
+      if (typeof formatMoney !== 'function') {
+        console.warn('formatMoney function is not available.');
+        return (price * rate).toFixed(2);
+      }
+    
+      return formatMoney(price * rate);
+    }
+    
   return (
     <div className="sidebar-box-content-col col-lg-3 col-md-3 col-6 pr_animated done mt__30 pr_loop_11 pr_grid_item product nt_pr desgin__1">
       <div className="product-inner pr">
@@ -41,10 +53,10 @@ const ProductItem = ({ product }) => {
             />
           </div>
           <div className="nt_add_w ts__03 pa">
-            <a href={"#"} className="wishlistadd cb chp ttip_nt tooltip_right">
+            <div className="wishlistadd cb chp ttip_nt tooltip_right">
               <span className="tt_txt">Add to Wishlist</span>
               <i className="fa-regular fa-heart" />
-            </a>
+            </div>
           </div>
           <div className="hover_button op__0 tc pa flex column ts__03 des_btns_pr_1 has_sizelistt4_true">
             <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")} data-id={product.productId} className="pr pr_atc cd br__40 bgw tc dib js__qs cb chp ttip_nt tooltip_top_left" rel="nofollow">
@@ -60,15 +72,15 @@ const ProductItem = ({ product }) => {
 
         <div className="product-info mt__15">
           <div className="product-brand">
-            <a className="cg chp" href={"#"}>{product.brand}</a>
+            <span className="cg chp">{product.brand}</span>
           </div>
           <h3 className="product-title pr fs__14 mg__0 fwm">
-            <a className="cd chp" href={"#"}>{product.name}</a>
+            <span className="cd chp">{product.name}</span>
           </h3>
           <div className="yotpo-widget-instance" data-yotpo-product-id={product.id} />
           <span className="price dib mb__5">
-            <del>Rs.{product.compareAtPrice}</del>
-            <ins>Rs.{window.getPrice(product.price)}</ins>
+            <del>{get_currency(product.compareAtPrice)}</del>
+            <ins>{get_currency(product.price)}</ins>
           </span>
           <div className="shopify-product-reviews-badge star-rating" data-id={product.id} />
         </div>
