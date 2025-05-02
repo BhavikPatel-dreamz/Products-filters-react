@@ -43,7 +43,7 @@ const Sidebar = () => {
       { title: "Gender", items: gender, filterKey: "gender" },
       { title: "Group", items: productGroup, filterKey: "productGroup" },
       { title: "Type", items: productTypes, filterKey: "productType" },
-      { title: "Color", items: colors, filterKey: "color" },
+      { title: "Color", items: colors, filterKey: "colors" },
       { title: "Brand", items: productBrand, filterKey: "brand" },
       { title: "Material", items: productMaterial, filterKey: "material" },
       { title: "Fabrics", items: fabrics, filterKey: "fabrics" },
