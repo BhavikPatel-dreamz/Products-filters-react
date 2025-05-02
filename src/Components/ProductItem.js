@@ -1,7 +1,7 @@
 import React from "react";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-
+import parse from 'html-react-parser';
 
 const ProductItem = ({ product }) => {
 
@@ -15,11 +15,23 @@ const ProductItem = ({ product }) => {
     
       if (typeof formatMoney !== 'function') {
         console.warn('formatMoney function is not available.');
-        return (price * rate).toFixed(2);
+        return ((price*100) * rate).toFixed(2);
       }
     
       return formatMoney(price * rate);
     }
+    
+    // Generate the price HTML string
+    const getPriceHTML = () => {
+      let html = '<span class="price dib mb__5">';
+      if (product.compareAtPrice) {
+        html += `<del>${get_currency(product.compareAtPrice)}</del>`;
+      }
+      html += `<ins>${get_currency(product.price)}</ins>`;
+      html += '</span>';
+      
+      return html;
+    };
     
   return (
     <div className="sidebar-box-content-col col-lg-3 col-md-3 col-6 pr_animated done mt__30 pr_loop_11 pr_grid_item product nt_pr desgin__1">
@@ -78,10 +90,10 @@ const ProductItem = ({ product }) => {
             <span className="cd chp">{product.name}</span>
           </h3>
           <div className="yotpo-widget-instance" data-yotpo-product-id={product.id} />
-          <span className="price dib mb__5">
-            <del>{get_currency(product.compareAtPrice)}</del>
-            <ins>{get_currency(product.price)}</ins>
-          </span>
+          
+          {/* Using html-react-parser for the price section */}
+          {parse(getPriceHTML())}
+          
           <div className="shopify-product-reviews-badge star-rating" data-id={product.id} />
         </div>
 
