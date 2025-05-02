@@ -40,11 +40,11 @@ const Sidebar = () => {
     const filterOrder = collectionElement?.dataset?.filterOrder;
   
     const filterConfigs = [
-      { title: "Gender", items: gender, filterKey: "gender" },
+      { title: "Gender", items: gender, filterKey: "genders" },
       { title: "Group", items: productGroup, filterKey: "productGroup" },
       { title: "Type", items: productTypes, filterKey: "productType" },
       { title: "Color", items: colors, filterKey: "colors" },
-      { title: "Brand", items: productBrand, filterKey: "brand" },
+      { title: "Brand", items: productBrand, filterKey: "brands" },
       { title: "Material", items: productMaterial, filterKey: "material" },
       { title: "Fabrics", items: fabrics, filterKey: "fabrics" },
       { title: "Works", items: work, filterKey: "works" },
