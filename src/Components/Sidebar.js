@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosinstance";
 import FilterSection from "./Filtersidebar";
@@ -74,48 +74,44 @@ const Sidebar = () => {
   }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
   
 
+  const fetchFilters = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
 
+      Object.entries(filters).forEach(([key, value]) => {
+        queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
+      });
 
-  useEffect(() => {
-    if (fetchOnceRef.current) return; // Prevent second call
-    fetchOnceRef.current = true;
-  
-    const fetchFilters = async () => {
-      try {
-        setLoading(true);
-        const queryParams = new URLSearchParams();
-  
-        Object.entries(filters).forEach(([key, value]) => {
-          queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
-        });
-  
-        const collectionElement = document.getElementById("collection");
-        const collectionName = collectionElement?.dataset?.collection;
-        if (collectionName) {
-          queryParams.set("collections", collectionName);
-        }
-  
-        const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
-        const data = response.data.data;
-  
-        setColors(data.attributes.colors);
-        setProductTypes(data.productTypes);
-        setProductBrand(data.brands);
-        setProductMaterial(data.attributes.materials);
-        setProductGroup(data.productGroups);
-        setGender(data.attributes.genders);
-        setFabrics(data.attributes.fabrics);
-        setWork(data.attributes.works);
-        setSize(data.attributes.sizes);
-      } catch (err) {
-        console.error("Failed to fetch filters:", err);
-      } finally {
-        setLoading(false);
+      const collectionElement = document.getElementById("collection");
+      const collectionName = collectionElement?.dataset?.collection;
+      if (collectionName) {
+        queryParams.set("collections", collectionName);
       }
-    };
-  
-    fetchFilters(); // ✅ Now guaranteed to run only once
-  }, [filters]);
+
+      const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
+      const data = response.data.data;
+
+      setColors(data.attributes.colors);
+      setProductTypes(data.productTypes);
+      setProductBrand(data.brands);
+      setProductMaterial(data.attributes.materials);
+      setProductGroup(data.productGroups);
+      setGender(data.attributes.genders);
+      setFabrics(data.attributes.fabrics);
+      setWork(data.attributes.works);
+      setSize(data.attributes.sizes);
+    } catch (err) {
+      console.error("Failed to fetch filters:", err);
+    } finally {
+      setLoading(false);
+    }
+   
+  };
+
+ useEffect(() => {
+  fetchFilters()
+ },[searchParams])
 
 
 
@@ -127,13 +123,14 @@ const Sidebar = () => {
       brand: filters.brand ? (Array.isArray(filters.brand) ? filters.brand : [filters.brand]) : [],
       material: filters.material ? (Array.isArray(filters.material) ? filters.material : [filters.material]) : [],
       productGroup: filters.productGroup ? (Array.isArray(filters.productGroup) ? filters.productGroup : [filters.productGroup]) : [],
-      fabrics: filters.fabrics ? (Array.isArray(filters.fabrics) ? filters.fabrics : [filters.fabrics]) : [],
-      works: filters.works ? (Array.isArray(filters.works) ? filters.works : [filters.works]) : [],
+      fabric: filters.fabric ? (Array.isArray(filters.fabric) ? filters.fabric : [filters.fabric]) : [],
+      work: filters.work ? (Array.isArray(filters.work) ? filters.work : [filters.work]) : [],
       sizes: filters.sizes ? (Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes]) : [],
     });
   }, [filters]);
 
   const handleCheckboxChange = (category, value) => {
+    fetchOnceRef.current = true;
     setSelectedFilters((prev) => {
       const updatedCategory = prev[category] ? [...prev[category]] : [];
 
@@ -147,6 +144,7 @@ const Sidebar = () => {
       return newFilters;
     });
   };
+
 
   const updateFilters = (newFilters) => {
     const updatedParams = new URLSearchParams(location.search);
