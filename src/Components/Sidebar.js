@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosinstance";
 import FilterSection from "./Filtersidebar";
@@ -23,6 +23,8 @@ const Sidebar = () => {
 
   const location = useLocation();
   const fetchOnceRef = useRef(false);
+  const isFetchingRef = useRef(false);
+  const prevSearchParamsRef = useRef('');
 
   const filters = useMemo(() => {
     const result = {};
@@ -35,10 +37,10 @@ const Sidebar = () => {
 
   useEffect(() => {
     const collectionElement = document.getElementById("collection");
-  
+
     const enabledFilters = collectionElement?.dataset?.enabledFilters;
     const filterOrder = collectionElement?.dataset?.filterOrder;
-  
+
     const filterConfigs = [
       { title: "Gender", items: gender, filterKey: "genders" },
       { title: "Group", items: productGroup, filterKey: "productGroup" },
@@ -50,48 +52,62 @@ const Sidebar = () => {
       { title: "Works", items: work, filterKey: "works" },
       { title: "Size", items: size, filterKey: "sizes" }
     ];
-  
+
     let filteredConfigs = filterConfigs;
-  
+
     if (enabledFilters) {
       const enabledKeys = enabledFilters.split(",").map(item => item.trim());
-  
+
       filteredConfigs = filterConfigs.filter(config =>
         enabledKeys.includes(config.filterKey)
       );
     }
-  
+
     // Apply ordering if provided and valid
     if (filterOrder) {
       const orderKeys = filterOrder.split(",").map(item => item.trim());
-  
+
       filteredConfigs = [...filteredConfigs].sort((a, b) =>
         orderKeys.indexOf(a.filterKey) - orderKeys.indexOf(b.filterKey)
       );
     }
-  
+
     setEnabledFilterConfigs(filteredConfigs);
   }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
-  
+
 
   const fetchFilters = async () => {
+    // If already fetching, don't start another fetch
+    if (isFetchingRef.current) return;
+    
+    // Get current search params string to compare
+    const currentSearchParamsString = searchParams.toString();
+    
+    // If nothing changed, don't fetch
+    if (currentSearchParamsString === prevSearchParamsRef.current) return;
+    
+    // Update ref with current search params
+    prevSearchParamsRef.current = currentSearchParamsString;
+    
     try {
+      isFetchingRef.current = true;
       setLoading(true);
+      
       const queryParams = new URLSearchParams();
-
+  
       Object.entries(filters).forEach(([key, value]) => {
         queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
       });
-
+  
       const collectionElement = document.getElementById("collection");
       const collectionName = collectionElement?.dataset?.collection;
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
-
+      
       const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
       const data = response.data.data;
-
+      
       setColors(data.attributes.colors);
       setProductTypes(data.productTypes);
       setProductBrand(data.brands);
@@ -105,15 +121,14 @@ const Sidebar = () => {
       console.error("Failed to fetch filters:", err);
     } finally {
       setLoading(false);
+      // Reset the fetching flag
+      isFetchingRef.current = false;
     }
-   
   };
 
- useEffect(() => {
-  fetchFilters()
- },[searchParams])
-
-
+  useEffect(() => {
+    fetchFilters();
+  }, [searchParams]);
 
   useEffect(() => {
     setSelectedFilters({
@@ -129,8 +144,9 @@ const Sidebar = () => {
     });
   }, [filters]);
 
+ 
+  
   const handleCheckboxChange = (category, value) => {
-    fetchOnceRef.current = true;
     setSelectedFilters((prev) => {
       const updatedCategory = prev[category] ? [...prev[category]] : [];
 

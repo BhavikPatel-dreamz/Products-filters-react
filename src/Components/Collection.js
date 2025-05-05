@@ -35,6 +35,7 @@ const Collection = ({ sort }) => {
 
     const navigate = useNavigate();
     const collectionName = useMemo(() => name, [name]);
+
     const filters = useMemo(() => {
         const baseFilters = {};
         for (const [key, value] of searchParams.entries()) {
@@ -96,8 +97,8 @@ const Collection = ({ sort }) => {
         if (collectionName) {
             queryParams.set("collections", collectionName);
         }
-    
         const queryString = queryParams.toString();
+        console.log(queryString,"queryParams")
         if (lastFetchParamsRef.current === queryString) return;
         lastFetchParamsRef.current = queryString;
     
