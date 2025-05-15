@@ -19,7 +19,7 @@ const FilterSection = ({ title, items, selectedFilters, filterKey, handleCheckbo
       <div className="loke_scroll t4s-facet-content">
         <ul className="nt_filter_block nt_filter_color css_ntbar t4s-filter__values is--style-checkbox cus-filter-value">
           {items.map((item, i) => {
-            const inputId = `${normalizedKey}-${item}`;
+            const inputId = `${normalizedKey}-${item?.value}`;
             return (
               <li key={i}>
                 <label className='sidebar-filter' htmlFor={inputId}>
@@ -27,11 +27,11 @@ const FilterSection = ({ title, items, selectedFilters, filterKey, handleCheckbo
                     id={inputId}
                     name={normalizedKey}
                     type="checkbox"
-                    checked={selectedFilters[normalizedKey]?.includes(item)}
-                    onChange={() => handleCheckboxChange(normalizedKey, item)}
+                    checked={selectedFilters[normalizedKey]?.includes(item?.value)}
+                    onChange={() => handleCheckboxChange(normalizedKey, item?.value)}
                     className='t4s-checkbox-wrapper t4s-pr t4s-oh'
                   />
-                  {item}
+                  {item.value}({item.count})
                 </label>
               </li>
             );
