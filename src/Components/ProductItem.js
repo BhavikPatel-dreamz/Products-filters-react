@@ -51,14 +51,14 @@ const ProductItem = ({ product }) => {
             onClick={() => handleImageClick(product)}
           >
             <LazyLoadImage
-              src={`${product.imageUrl}?width=263&height=403` || null}
+              src={`${product.imageUrl}?width=268&height=403` || null}
               alt={product.name}
               className="main-img"
               effect="blur"
               style={{ height: "403px" }}
             />
             <img
-              src={`${product.images?.[1]?.url}?width=263&height=403` || `${product.imageUrl}?width=263&height=403` || null}
+              src={`${product.images?.[1]?.url}?width=268&height=403` || `${product.imageUrl}?width=268&height=403` || null}
               alt={product.name}
               className="hover-img"
               style={{ height: "403px" }}
