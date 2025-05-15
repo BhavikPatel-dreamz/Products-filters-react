@@ -34,7 +34,7 @@ const ProductItem = ({ product }) => {
     };
     
   return (
-    <div className="sidebar-box-content-col col-lg-3 col-md-3 col-6 pr_animated done mt__30 pr_loop_11 pr_grid_item product nt_pr desgin__1">
+     <div className="sidebar-box-content-col col-lg-3 col-md-3 col-6 pr_animated done mt__30 pr_loop_11 pr_grid_item product nt_pr desgin__1">
       <div className="product-inner pr">
         <div className="product-image pr oh lazyloadt4sed">
           <span className="tc nt_labels pa pe_none cw">
@@ -51,14 +51,14 @@ const ProductItem = ({ product }) => {
             onClick={() => handleImageClick(product)}
           >
             <LazyLoadImage
-              src={product.imageUrl || null}
+              src={`${product.imageUrl}?width=263&height=403` || null}
               alt={product.name}
               className="main-img"
               effect="blur"
               style={{ height: "403px" }}
             />
             <img
-              src={product.images?.[1]?.url || product.imageUrl || null}
+              src={`${product.images?.[1]?.url}?width=263&height=403` || `${product.imageUrl}?width=263&height=403` || null}
               alt={product.name}
               className="hover-img"
               style={{ height: "403px" }}
