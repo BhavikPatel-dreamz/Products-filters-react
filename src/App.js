@@ -4,11 +4,13 @@ import Collection from './Components/Collection';
 import Dropdown from './Components/Dropdown';
 import Header from './Components/Header';
 import Sidebar from './Components/Sidebar';
+import { Provider } from 'react-redux';
+import store from './Redux/Slices/store';
 
 
 const Layout = ({ children }) => {
   const [sort, setSort] = useState("");
-  
+
   const initialFilters = (() => {
     const el = document.getElementById("collection");
     const attr = el?.dataset?.showFilters;
@@ -46,16 +48,18 @@ const Layout = ({ children }) => {
 
 const App = () => {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Layout>
-            {({ sort }) => <Collection sort={sort} />}
-          </Layout>
-        }
-      />
-    </Routes>
+    <Provider store={store}>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout>
+              {({ sort }) => <Collection sort={sort} />}
+            </Layout>
+          }
+        />
+      </Routes>
+    </Provider>
   );
 };
 

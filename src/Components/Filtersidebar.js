@@ -1,4 +1,5 @@
 import React from 'react';
+import PriceRangeSlider from './PriceRange';
 
 const FilterSection = ({ title, items, selectedFilters, filterKey, handleCheckboxChange }) => {
   // Define mapping of plural keys to their normalized singular form

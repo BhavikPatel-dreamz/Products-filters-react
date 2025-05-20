@@ -98,7 +98,7 @@ const Collection = ({ sort }) => {
             queryParams.set("collections", collectionName);
         }
         const queryString = queryParams.toString();
-        console.log(queryString,"queryParams")
+        
         if (lastFetchParamsRef.current === queryString) return;
         lastFetchParamsRef.current = queryString;
     

@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosinstance";
 import FilterSection from "./Filtersidebar";
+import PriceRangeSlider from "./PriceRange";
+import { useDispatch, useSelector } from "react-redux";
+import SelectedFilters from "./SlectedFilter";
+import { selectDisplayRange, setDisplayRange } from "../Redux/Slices/PriceRange";
 
 const Sidebar = () => {
   const [colors, setColors] = useState([]);
@@ -16,11 +20,12 @@ const Sidebar = () => {
   const [work, setWork] = useState([]);
   const [size, setSize] = useState([]);
   const [fabrics, setFabrics] = useState([]);
-
-
+  const [price, setPrice] = useState({});
+  const [chackbox , setCheckbox] = useState(false)
+  const dispatch = useDispatch()
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  const displayRange = useSelector(selectDisplayRange);
   const location = useLocation();
   const fetchOnceRef = useRef(false);
   const isFetchingRef = useRef(false);
@@ -33,6 +38,64 @@ const Sidebar = () => {
     }
     return result;
   }, [searchParams]);
+
+  const getFilterLabel = (filterKey, value) => {
+    const allItems = {
+      genders: gender,
+      productGroup: productGroup,
+      productType: productTypes,
+      colors: colors,
+      brands: productBrand,
+      material: productMaterial,
+      fabrics: fabrics,
+      works: work,
+      sizes: size
+    };
+
+    const foundItem = allItems[filterKey]?.find(item => item.slug === value || item.id === value);
+    return foundItem?.name || foundItem?.title || value;
+  };
+
+  const handleRemoveFilter = (filterKey, value) => {
+    setSelectedFilters(prev => {
+      let newFilters = { ...prev };
+
+      if (filterKey === 'price') {
+        newFilters.minPrice = '';
+        newFilters.maxPrice = '';
+      } else {
+        const updatedCategory = prev[filterKey] ? [...prev[filterKey]] : [];
+        const valueIndex = updatedCategory.indexOf(value);
+
+        if (valueIndex > -1) {
+          updatedCategory.splice(valueIndex, 1);
+        }
+
+        newFilters[filterKey] = updatedCategory.length ? updatedCategory : [];
+      }
+
+      updateFilters(newFilters);
+      return newFilters;
+    });
+  };
+
+  useEffect(() => {
+    if (displayRange) {
+      setSelectedFilters(prev => {
+        const newFilters = {
+          ...prev,
+          minPrice: displayRange.min !== undefined ? displayRange.min : "",
+          maxPrice: displayRange.max !== undefined ? displayRange.max : ""
+        };
+        if(chackbox){
+          dispatch(setDisplayRange({ min: price.min, max:price.max  }));
+        }
+        updateFilters(newFilters);
+        return newFilters;
+      });
+    }
+    setCheckbox(false)
+  }, [displayRange,price]);
 
 
   useEffect(() => {
@@ -50,7 +113,7 @@ const Sidebar = () => {
       { title: "Material", items: productMaterial, filterKey: "material" },
       { title: "Fabrics", items: fabrics, filterKey: "fabrics" },
       { title: "Works", items: work, filterKey: "works" },
-      { title: "Size", items: size, filterKey: "sizes" }
+      { title: "Size", items: size, filterKey: "sizes" },
     ];
 
     let filteredConfigs = filterConfigs;
@@ -75,48 +138,48 @@ const Sidebar = () => {
     setEnabledFilterConfigs(filteredConfigs);
   }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
 
-
   const fetchFilters = async () => {
     // If already fetching, don't start another fetch
     if (isFetchingRef.current) return;
-    
+
     // Get current search params string to compare
     const currentSearchParamsString = searchParams.toString();
-    
+
     // If nothing changed, don't fetch
     if (currentSearchParamsString === prevSearchParamsRef.current) return;
-    
+
     // Update ref with current search params
     prevSearchParamsRef.current = currentSearchParamsString;
-    
+
     try {
       isFetchingRef.current = true;
       setLoading(true);
-      
+
       const queryParams = new URLSearchParams();
-  
+
       Object.entries(filters).forEach(([key, value]) => {
         queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
       });
-  
+
       const collectionElement = document.getElementById("collection");
       const collectionName = collectionElement?.dataset?.collection;
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
-      
+
       const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
       const data = response.data.data;
-      
-      setColors(data.attributes.colors);
-      setProductTypes(data.productTypes);
-      setProductBrand(data.brands);
-      setProductMaterial(data.attributes.materials);
-      setProductGroup(data.productGroups);
-      setGender(data.attributes.genders);
-      setFabrics(data.attributes.fabrics);
-      setWork(data.attributes.works);
-      setSize(data.attributes.sizes);
+
+      setColors(data?.attributes?.colors);
+      setProductTypes(data?.productTypes);
+      setProductBrand(data?.brands);
+      setProductMaterial(data?.attributes?.materials);
+      setProductGroup(data?.productGroups);
+      setGender(data?.attributes?.genders);
+      setFabrics(data?.attributes?.fabrics);
+      setWork(data?.attributes?.works);
+      setSize(data?.attributes?.sizes);
+      setPrice(data?.priceRange);
     } catch (err) {
       console.error("Failed to fetch filters:", err);
     } finally {
@@ -141,11 +204,11 @@ const Sidebar = () => {
       fabric: filters.fabric ? (Array.isArray(filters.fabric) ? filters.fabric : [filters.fabric]) : [],
       work: filters.work ? (Array.isArray(filters.work) ? filters.work : [filters.work]) : [],
       sizes: filters.sizes ? (Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes]) : [],
+      minPrice: filters.minPrice || "",
+      maxPrice: filters.maxPrice || ""
     });
   }, [filters]);
 
- 
-  
   const handleCheckboxChange = (category, value) => {
     setSelectedFilters((prev) => {
       const updatedCategory = prev[category] ? [...prev[category]] : [];
@@ -159,8 +222,8 @@ const Sidebar = () => {
       updateFilters(newFilters);
       return newFilters;
     });
+    setCheckbox(true)
   };
-
 
   const updateFilters = (newFilters) => {
     const updatedParams = new URLSearchParams(location.search);
@@ -170,7 +233,7 @@ const Sidebar = () => {
         if (value.length) {
           updatedParams.set(key, value.join(','));
         } else {
-          updatedParams.delete(key); // Remove the filter if empty
+          updatedParams.delete(key);
         }
       } else if (value !== null && value !== undefined && value !== '') {
         updatedParams.set(key, value);
@@ -178,11 +241,14 @@ const Sidebar = () => {
         updatedParams.delete(key);
       }
     });
-    setTimeout(() => {
-      navigate(`?${updatedParams.toString()}`, { replace: true });
-    }, 0);
-  };
 
+    // Ensure we don't create a navigation loop
+    if (updatedParams.toString() !== location.search.replace('?', '')) {
+      setTimeout(() => {
+        navigate(`?${updatedParams.toString()}`, { replace: true });
+      }, 0);
+    }
+  };
 
 
   const renderSkeleton = () => (
@@ -209,6 +275,11 @@ const Sidebar = () => {
     <div>
       <div className="shopify-section nt_ajaxFilter section_sidebar_shop type_instagram" style={{ display: "block" }}>
         <div className="wrap_filter">
+          <SelectedFilters
+            selectedFilters={selectedFilters}
+            getFilterLabel={getFilterLabel}
+            handleRemoveFilter={handleRemoveFilter}
+          />
           {loading ? (
             renderSkeleton()
           ) : (
@@ -225,6 +296,7 @@ const Sidebar = () => {
                   />
                 )
               )}
+              <PriceRangeSlider price={price} />
             </>
           )}
         </div>
