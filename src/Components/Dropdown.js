@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Dropdown = ({ setSort }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +16,7 @@ const Dropdown = ({ setSort }) => {
     <div className="select-dropdown-main">
       <div className="select-dropdown">
         <div onClick={toggleDropdown} className="select-dropdown__button">
-          <span>{selectedValue || "Sort by"}</span> {/* Default label */}
+          <span>{selectedValue || "Sort by"}</span> 
           <i className="fa-solid fa-chevron-down"></i>
         </div>
         {isOpen && (

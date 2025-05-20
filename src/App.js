@@ -10,7 +10,7 @@ import store from './Redux/Slices/store';
 
 const Layout = ({ children }) => {
   const [sort, setSort] = useState("");
-
+  console.log(sort,"app")
   const initialFilters = (() => {
     const el = document.getElementById("collection");
     const attr = el?.dataset?.showFilters;

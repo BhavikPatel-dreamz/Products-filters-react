@@ -30,7 +30,6 @@ const PriceRangeSlider = (price) => {
   const dispatch = useDispatch();
   const priceRange = useSelector(selectPriceRange);
   const displayRange = useSelector(selectDisplayRange);
-  console.log(displayRange,"displayRange")
   
   const [isDragging, setIsDragging] = useState(null);
   const [minValue, setMinValue] = useState(price.price.min);

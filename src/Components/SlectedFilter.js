@@ -1,6 +1,20 @@
 // components/SelectedFilters.js
 import React from "react";
 
+
+function get_currency(price) {
+  const rate = window.Shopify?.currency?.rate || 1;
+  const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;
+
+  if (typeof formatMoney !== 'function') {
+    console.warn('formatMoney function is not available.');
+    return ((price*100) * rate);
+  }
+
+  return formatMoney((price*100) * rate);
+}
+
+
 const SelectedFilterTag = ({ label, value, onRemove }) => (
   <div className="selected-filter-tag">
     <span>{label}: {value}</span>
@@ -30,7 +44,7 @@ const SelectedFilters = ({ selectedFilters, getFilterLabel, handleRemoveFilter }
         <SelectedFilterTag
           key="price-range"
           label="Price Range"
-          value={`${selectedFilters.minPrice} - ${selectedFilters.maxPrice}`}
+          value={`${get_currency(selectedFilters.minPrice)} - ${get_currency(selectedFilters.maxPrice)}`}
           onRemove={() => handleRemoveFilter("price")}
         />
       )}
