@@ -2,13 +2,13 @@ import React, { useState } from "react";
 
 const Dropdown = ({ setSort }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("Featured");
+  const [selectedValue, setSelectedValue] = useState(null); // use null for clean conditional
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
-  const handleSelectItem = (value, sortValue) => {
-    setSelectedValue(value);
-    setSort(sortValue); 
+  const handleSelectItem = (label, sortValue) => {
+    setSelectedValue(label);
+    setSort(sortValue);
     setIsOpen(false);
   };
 
@@ -16,7 +16,7 @@ const Dropdown = ({ setSort }) => {
     <div className="select-dropdown-main">
       <div className="select-dropdown">
         <div onClick={toggleDropdown} className="select-dropdown__button">
-          <span>{selectedValue}</span>
+          <span>{selectedValue || "Sort by"}</span> {/* Default label */}
           <i className="fa-solid fa-chevron-down"></i>
         </div>
         {isOpen && (

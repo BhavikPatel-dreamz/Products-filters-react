@@ -139,16 +139,10 @@ const Sidebar = () => {
   }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
 
   const fetchFilters = async () => {
-    // If already fetching, don't start another fetch
+
     if (isFetchingRef.current) return;
-
-    // Get current search params string to compare
     const currentSearchParamsString = searchParams.toString();
-
-    // If nothing changed, don't fetch
     if (currentSearchParamsString === prevSearchParamsRef.current) return;
-
-    // Update ref with current search params
     prevSearchParamsRef.current = currentSearchParamsString;
 
     try {
@@ -166,7 +160,7 @@ const Sidebar = () => {
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
-
+      
       const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
       const data = response.data.data;
 

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setRange, setDisplayRange, selectPriceRange, selectDisplayRange } from '../Redux/Slices/PriceRange';
+import parse from 'html-react-parser';
 
 const PriceRangeSlider = (price) => {
 
@@ -10,11 +11,21 @@ const PriceRangeSlider = (price) => {
   
     if (typeof formatMoney !== 'function') {
       console.warn('formatMoney function is not available.');
-      return ((price*100) * rate).toFixed(2);
+      return ((price*100) * rate);
     }
   
-    return formatMoney(price * rate);
+    return formatMoney((price*100) * rate);
   }
+
+  const getMaxPriceHTML = (maxValue) => {
+   let html = `<span>${get_currency(maxValue)}</span>`;
+    return html;
+  };
+
+  const getMinPriceHTML = (minValue) => {
+    let html = `<span>${get_currency(minValue)}</span>`;
+     return html;
+   };
 
   const dispatch = useDispatch();
   const priceRange = useSelector(selectPriceRange);
@@ -125,7 +136,7 @@ const PriceRangeSlider = (price) => {
           aria-valuemax={maxValue - 1}
         >
           <div className='tooltip'>
-            {get_currency(minValue)}
+          {parse(getMinPriceHTML(minValue))}
           </div>
         </div>
         <div
@@ -143,7 +154,8 @@ const PriceRangeSlider = (price) => {
           aria-valuemax={rangeConfig.max}
         >
           <div className='tooltip'>
-            {get_currency(maxValue)}
+          
+              {parse(getMaxPriceHTML(maxValue))}
           </div>
         </div>
       </div>

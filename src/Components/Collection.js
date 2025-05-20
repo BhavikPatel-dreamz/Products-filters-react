@@ -86,6 +86,19 @@ const Collection = ({ sort }) => {
         }));
     }, [urlPage]);
 
+    useEffect(() => {
+        const currentSort = searchParams.get("sort");
+        if (sort && currentSort !== sort) {
+            const newParams = new URLSearchParams(searchParams.toString());
+            newParams.set("sort", sort);
+            // Reset to page 1 when sort changes
+            newParams.set("page", "1");
+            navigate(`?${newParams.toString()}`, { replace: true });
+        }
+    }, [sort, searchParams, navigate]);
+    
+    
+
     const fetchData = useCallback(async () => {
         const queryParams = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
