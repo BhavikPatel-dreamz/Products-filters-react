@@ -18,7 +18,7 @@ const ProductItem = ({ product }) => {
         return ((price*100) * rate).toFixed(2);
       }
     
-      return formatMoney(price * rate);
+      return formatMoney((price*100) * rate);
     }
     
     // Generate the price HTML string
