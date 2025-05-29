@@ -20,8 +20,8 @@ const Sidebar = () => {
   const [work, setWork] = useState([]);
   const [size, setSize] = useState([]);
   const [fabrics, setFabrics] = useState([]);
-  const [price, setPrice] = useState({});
-  const [chackbox , setCheckbox] = useState(false)
+  const [price, setPrice] = useState();
+  const [chackbox, setCheckbox] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -39,65 +39,6 @@ const Sidebar = () => {
     return result;
   }, [searchParams]);
 
-  const getFilterLabel = (filterKey, value) => {
-    const allItems = {
-      genders: gender,
-      productGroup: productGroup,
-      productType: productTypes,
-      colors: colors,
-      brands: productBrand,
-      material: productMaterial,
-      fabrics: fabrics,
-      works: work,
-      sizes: size
-    };
-
-    const foundItem = allItems[filterKey]?.find(item => item.slug === value || item.id === value);
-    return foundItem?.name || foundItem?.title || value;
-  };
-
-  const handleRemoveFilter = (filterKey, value) => {
-    setSelectedFilters(prev => {
-      let newFilters = { ...prev };
-
-      if (filterKey === 'price') {
-        newFilters.minPrice = '';
-        newFilters.maxPrice = '';
-      } else {
-        const updatedCategory = prev[filterKey] ? [...prev[filterKey]] : [];
-        const valueIndex = updatedCategory.indexOf(value);
-
-        if (valueIndex > -1) {
-          updatedCategory.splice(valueIndex, 1);
-        }
-
-        newFilters[filterKey] = updatedCategory.length ? updatedCategory : [];
-      }
-
-      updateFilters(newFilters);
-      return newFilters;
-    });
-  };
-
-  useEffect(() => {
-    if (displayRange) {
-      setSelectedFilters(prev => {
-        const newFilters = {
-          ...prev,
-          minPrice: displayRange.min !== undefined ? displayRange.min : "",
-          maxPrice: displayRange.max !== undefined ? displayRange.max : ""
-        };
-        if(chackbox){
-          dispatch(setDisplayRange({ min: price.min, max:price.max  }));
-        }
-        updateFilters(newFilters);
-        return newFilters;
-      });
-    }
-    setCheckbox(false)
-  }, [displayRange,price]);
-
-
   useEffect(() => {
     const collectionElement = document.getElementById("collection");
 
@@ -113,7 +54,8 @@ const Sidebar = () => {
       { title: "Material", items: productMaterial, filterKey: "material" },
       { title: "Fabrics", items: fabrics, filterKey: "fabrics" },
       { title: "Works", items: work, filterKey: "works" },
-      { title: "Size", items: size, filterKey: "sizes" },
+      { title: "Size", items: size, filterKey: "size" },
+      { title: "Price Range", item: price, filterKey: "price" }
     ];
 
     let filteredConfigs = filterConfigs;
@@ -139,7 +81,6 @@ const Sidebar = () => {
   }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
 
   const fetchFilters = async () => {
-
     if (isFetchingRef.current) return;
     const currentSearchParamsString = searchParams.toString();
     if (currentSearchParamsString === prevSearchParamsRef.current) return;
@@ -152,7 +93,16 @@ const Sidebar = () => {
       const queryParams = new URLSearchParams();
 
       Object.entries(filters).forEach(([key, value]) => {
-        queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
+        // Only add parameters that have actual values
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              queryParams.set(key, value.join(","));
+            }
+          } else {
+            queryParams.set(key, value);
+          }
+        }
       });
 
       const collectionElement = document.getElementById("collection");
@@ -160,7 +110,7 @@ const Sidebar = () => {
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
-      
+
       const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
       const data = response.data.data;
 
@@ -173,7 +123,8 @@ const Sidebar = () => {
       setFabrics(data?.attributes?.fabrics);
       setWork(data?.attributes?.works);
       setSize(data?.attributes?.sizes);
-      setPrice(data?.priceRange);
+      // setPrice({min: 0, max: 5000});
+      setPrice(data.priceRange);
     } catch (err) {
       console.error("Failed to fetch filters:", err);
     } finally {
@@ -182,13 +133,12 @@ const Sidebar = () => {
       isFetchingRef.current = false;
     }
   };
-
   useEffect(() => {
     fetchFilters();
   }, [searchParams]);
 
   useEffect(() => {
-    setSelectedFilters({
+    const newSelectedFilters = {
       gender: filters.gender ? (Array.isArray(filters.gender) ? filters.gender : [filters.gender]) : [],
       color: filters.color ? (Array.isArray(filters.color) ? filters.color : [filters.color]) : [],
       productType: filters.productType ? (Array.isArray(filters.productType) ? filters.productType : [filters.productType]) : [],
@@ -197,10 +147,13 @@ const Sidebar = () => {
       productGroup: filters.productGroup ? (Array.isArray(filters.productGroup) ? filters.productGroup : [filters.productGroup]) : [],
       fabric: filters.fabric ? (Array.isArray(filters.fabric) ? filters.fabric : [filters.fabric]) : [],
       work: filters.work ? (Array.isArray(filters.work) ? filters.work : [filters.work]) : [],
-      sizes: filters.sizes ? (Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes]) : [],
-      minPrice: filters.minPrice || "",
-      maxPrice: filters.maxPrice || ""
-    });
+      size: filters.size ? (Array.isArray(filters.size) ? filters.size : [filters.size]) : [],
+      // Only set minPrice and maxPrice if they exist in the URL
+      ...(filters.minPrice && { minPrice: filters.minPrice }),
+      ...(filters.maxPrice && { maxPrice: filters.maxPrice })
+    };
+    
+    setSelectedFilters(newSelectedFilters);
   }, [filters]);
 
   const handleCheckboxChange = (category, value) => {
@@ -213,6 +166,11 @@ const Sidebar = () => {
         updatedCategory.push(value);
       }
       const newFilters = { ...prev, [category]: updatedCategory };
+      
+      // Remove minPrice and maxPrice when any checkbox is changed
+      delete newFilters.minPrice;
+      delete newFilters.maxPrice;
+      
       updateFilters(newFilters);
       return newFilters;
     });
@@ -221,10 +179,10 @@ const Sidebar = () => {
 
   const updateFilters = (newFilters) => {
     const updatedParams = new URLSearchParams(location.search);
-
+    
     Object.entries(newFilters).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        if (value.length) {
+        if (value.length > 0) {
           updatedParams.set(key, value.join(','));
         } else {
           updatedParams.delete(key);
@@ -236,6 +194,10 @@ const Sidebar = () => {
       }
     });
 
+    // Always remove minPrice and maxPrice when checkbox is changed
+    updatedParams.delete('minPrice');
+    updatedParams.delete('maxPrice');
+
     // Ensure we don't create a navigation loop
     if (updatedParams.toString() !== location.search.replace('?', '')) {
       setTimeout(() => {
@@ -244,58 +206,26 @@ const Sidebar = () => {
     }
   };
 
-
-  const renderSkeleton = () => (
-    <>
-      {enabledFilterConfigs.map(({ title, filterKey }) => (
-        <div key={filterKey} className="filter-section-skeleton mb__20 widget widget_filter">
-          <div className="widget-title flex justify-between items-center">
-            <span className="skeleton-box title-skeleton" />
-          </div>
-          <div className="filter-items-skeleton mt__15">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="skeleton-checkbox-item mb__10">
-                <span className="skeleton-box skeleton-checkbox" />
-                <span className="skeleton-box skeleton-label" />
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </>
-  );
-
   return (
-    <div>
-      <div className="shopify-section nt_ajaxFilter section_sidebar_shop type_instagram" style={{ display: "block" }}>
-        <div className="wrap_filter">
-          <SelectedFilters
+    <>
+      {enabledFilterConfigs
+        .filter(({ items, item, filterKey }) => {
+          if (filterKey === 'price') return !!item;
+          return items?.length > 0;
+        })
+        .map(({ title, items, filterKey }) => (
+          <FilterSection
+            key={filterKey}
+            title={title}
+            items={items}
             selectedFilters={selectedFilters}
-            getFilterLabel={getFilterLabel}
-            handleRemoveFilter={handleRemoveFilter}
+            filterKey={filterKey}
+            handleCheckboxChange={handleCheckboxChange}
+            price={price}
           />
-          {loading ? (
-            renderSkeleton()
-          ) : (
-            <>
-              {enabledFilterConfigs.map(({ title, items, filterKey }) =>
-                items.length > 0 && (
-                  <FilterSection
-                    key={filterKey}
-                    title={title}
-                    items={items}
-                    selectedFilters={selectedFilters}
-                    filterKey={filterKey}
-                    handleCheckboxChange={handleCheckboxChange}
-                  />
-                )
-              )}
-              <PriceRangeSlider price={price} />
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+        ))}
+        
+    </>
   );
 };
 

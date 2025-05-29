@@ -20,10 +20,10 @@ export const priceRangeSlice = createSlice({
       state.displayMax = action.payload.max;
     },
     resetRange: (state) => {
-      state.min = initialState.min;
-      state.max = initialState.max;
-      state.displayMin = initialState.displayMin;
-      state.displayMax = initialState.displayMax;
+      state.min = null;
+      state.max = null;
+      state.displayMin = null;
+      state.displayMax = null;
     }
   }
 });

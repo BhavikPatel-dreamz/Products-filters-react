@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import PaginationComponent from "./pagination";
 import ProductItem from "./ProductItem";
 import LoadingSkeleton from "./LoadingSkeleton";
+import SelectedFilters from "./SlectedFilter";
 
 const Collection = ({ sort }) => {
     const collectionElement = document.getElementById("collection");
@@ -96,8 +97,8 @@ const Collection = ({ sort }) => {
             navigate(`?${newParams.toString()}`, { replace: true });
         }
     }, [sort, searchParams, navigate]);
-    
-    
+
+
 
     const fetchData = useCallback(async () => {
         const queryParams = new URLSearchParams();
@@ -111,13 +112,13 @@ const Collection = ({ sort }) => {
             queryParams.set("collections", collectionName);
         }
         const queryString = queryParams.toString();
-        
+
         if (lastFetchParamsRef.current === queryString) return;
         lastFetchParamsRef.current = queryString;
-    
+
         setLoading(true);
         setProducts([]);
-    
+
         try {
             const response = await axiosInstance.get(`/products?${queryString}`);
             if (response.data?.data) {
@@ -135,13 +136,13 @@ const Collection = ({ sort }) => {
             setLoading(false);
         }
     }, [filters, urlPage, sort, collectionName, paginationData.limit]);
-    
+
 
     // Create a dependency string for the fetch effect
     useEffect(() => {
         fetchData();
     }, [fetchData]);
-    
+
 
     const changePage = (newPage) => {
         const newParams = new URLSearchParams(searchParams.toString());
@@ -154,10 +155,10 @@ const Collection = ({ sort }) => {
             <LoadingSkeleton key={i} />
         ));
     };
-
     return (
-        <div id="shopify-section-collection_page" className="shopify-section tp_se_cdt">
-            <div className="on_list_view_false products nt_products_holder row fl_center row_pr_1 tc cdt_des_1 round_cd_false nt_cover ratio2_3 position_8 space_20 equal_nt nt_default">
+        <div>
+          <SelectedFilters/>
+            <div className="t4s_box_pr_grid t4s-products  t4s-text-default t4s_rationt  t4s_position_8 t4s_cover t4s-row  t4s-justify-content-center t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-md-15 t4s-gy-md-15 t4s-gx-10 t4s-gy-10">
                 {loading && products.length === 0 ? (
                     renderLoadingSkeletons()
                 ) : !loading && products.length === 0 ? (
@@ -172,7 +173,7 @@ const Collection = ({ sort }) => {
                 )}
             </div>
 
-            {showPagination && paginationData.pages > 1 &&  (
+            {showPagination && paginationData.pages > 1 && products.length > 0 && (
                 <PaginationComponent
                     currentPage={paginationData.page}
                     totalPages={paginationData.pages}
