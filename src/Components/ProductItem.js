@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import parse from 'html-react-parser';
 
 const ProductItem = ({ product }) => {
-  const [addToCart, setAddToCart] = useState(false)
-  const [selectedSize, setSelectedSize] = useState(null);
   const handleImageClick = (product) => {
     window.location.href = `${product.productUrl}`;
   };
@@ -33,12 +31,8 @@ const ProductItem = ({ product }) => {
     return html;
   };
 
-  const handleAddToCart = () => {
-    setAddToCart(true)
-  }
-  const handleSizeClick = (size) => {
-    setSelectedSize(size); // update selected size on click
-  };
+ 
+  
 
   function isIdInLocalStorage(id) {
     const key = 't4s_wis';
@@ -52,7 +46,6 @@ const ProductItem = ({ product }) => {
     return ids.includes(String(id));
   }
 
-
   return (
     <>
       <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-pr-6716638691523 t4s-col-item is-t4s-pr-created">
@@ -64,12 +57,12 @@ const ProductItem = ({ product }) => {
               onClick={() => handleImageClick(product)}
             >
               <img
-                src={`${product?.imageUrl}?width=268&height=403`}
+                src={`${product?.imageUrl}?width=350&height=452`}
                 alt={product.name}
                 className="t4s-product-main-img lazyautosizes lazyloadt4sed"
               />
               <img
-                src={`${product?.images?.[1]?.url}?width=268&height=403`}
+                src={`${product?.images?.[1]?.url}?width=350&height=452`}
                 alt={product?.name}
                 className="t4s-product-hover-img lazyautosizes lazyloadt4sed"
               />
@@ -90,10 +83,9 @@ const ProductItem = ({ product }) => {
               className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived"
               rel="nofollow"
             > */}
-              <a href="#" className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived">
+              <a href="#" className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived" data-id={product.variants[0].variantId}>
                 <span className="t4s-text-pr" onClick={e => {
                   e.preventDefault();
-                  handleAddToCart();
                 }}>Quick Shop</span>
               </a>
               {/* </a> */}
@@ -103,7 +95,7 @@ const ProductItem = ({ product }) => {
               <a
                 href="/collections/all-mens/products/mens-kurta-1019-at-011090-gren?_pos=1&_fid=d9fa77533&_ss=c"
                 data-tooltip="left"
-                data-id=""
+                data-id={product.variants[0].variantId}
                 rel="nofollow"
                 className={`t4s-pr-item-btn t4s-pr-wishlist ${isIdInLocalStorage(product.productId) ? 't4s-tooltip-actived' : ''
                   }`}
@@ -130,7 +122,7 @@ const ProductItem = ({ product }) => {
               <a
                 href={`/collections/all-mens/products/mens-kurta-1019-at-011090-gren?_pos=1&_fid=d9fa77533&_ss=c`}
                 data-tooltip="left"
-                data-id=""
+                data-id={product.variants[0].variantId}
                 rel="nofollow"
                 className="t4s-pr-item-btn t4s-pr-quickview t4s-tooltip-actived"
                 data-action-quickview=""

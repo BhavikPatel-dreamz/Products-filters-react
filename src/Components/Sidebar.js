@@ -2,10 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosinstance";
 import FilterSection from "./Filtersidebar";
-import PriceRangeSlider from "./PriceRange";
 import { useDispatch, useSelector } from "react-redux";
-import SelectedFilters from "./SlectedFilter";
-import { selectDisplayRange, setDisplayRange } from "../Redux/Slices/PriceRange";
+
 
 const Sidebar = () => {
   const [colors, setColors] = useState([]);
@@ -21,13 +19,10 @@ const Sidebar = () => {
   const [size, setSize] = useState([]);
   const [fabrics, setFabrics] = useState([]);
   const [price, setPrice] = useState();
-  const [chackbox, setCheckbox] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const displayRange = useSelector(selectDisplayRange);
   const location = useLocation();
-  const fetchOnceRef = useRef(false);
   const isFetchingRef = useRef(false);
   const prevSearchParamsRef = useRef('');
 
@@ -81,10 +76,10 @@ const Sidebar = () => {
   }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
 
   const fetchFilters = async () => {
-    if (isFetchingRef.current) return;
-    const currentSearchParamsString = searchParams.toString();
-    if (currentSearchParamsString === prevSearchParamsRef.current) return;
-    prevSearchParamsRef.current = currentSearchParamsString;
+    // if (isFetchingRef.current) return;
+    // const currentSearchParamsString = searchParams.toString();
+    // if (currentSearchParamsString === prevSearchParamsRef.current) return;
+    // prevSearchParamsRef.current = currentSearchParamsString;
 
     try {
       isFetchingRef.current = true;
@@ -113,7 +108,6 @@ const Sidebar = () => {
 
       const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
       const data = response.data.data;
-
       setColors(data?.attributes?.colors);
       setProductTypes(data?.productTypes);
       setProductBrand(data?.brands);
@@ -123,7 +117,6 @@ const Sidebar = () => {
       setFabrics(data?.attributes?.fabrics);
       setWork(data?.attributes?.works);
       setSize(data?.attributes?.sizes);
-      // setPrice({min: 0, max: 5000});
       setPrice(data.priceRange);
     } catch (err) {
       console.error("Failed to fetch filters:", err);
@@ -133,6 +126,8 @@ const Sidebar = () => {
       isFetchingRef.current = false;
     }
   };
+
+
   useEffect(() => {
     fetchFilters();
   }, [searchParams]);
@@ -152,7 +147,7 @@ const Sidebar = () => {
       ...(filters.minPrice && { minPrice: filters.minPrice }),
       ...(filters.maxPrice && { maxPrice: filters.maxPrice })
     };
-    
+
     setSelectedFilters(newSelectedFilters);
   }, [filters]);
 
@@ -166,20 +161,20 @@ const Sidebar = () => {
         updatedCategory.push(value);
       }
       const newFilters = { ...prev, [category]: updatedCategory };
-      
+
       // Remove minPrice and maxPrice when any checkbox is changed
       delete newFilters.minPrice;
       delete newFilters.maxPrice;
-      
+
       updateFilters(newFilters);
       return newFilters;
     });
-    setCheckbox(true)
+
   };
 
   const updateFilters = (newFilters) => {
     const updatedParams = new URLSearchParams(location.search);
-    
+
     Object.entries(newFilters).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         if (value.length > 0) {
@@ -200,9 +195,7 @@ const Sidebar = () => {
 
     // Ensure we don't create a navigation loop
     if (updatedParams.toString() !== location.search.replace('?', '')) {
-      setTimeout(() => {
-        navigate(`?${updatedParams.toString()}`, { replace: true });
-      }, 0);
+      navigate(`?${updatedParams.toString()}`, { replace: true });
     }
   };
 
@@ -224,7 +217,7 @@ const Sidebar = () => {
             price={price}
           />
         ))}
-        
+
     </>
   );
 };

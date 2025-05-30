@@ -52,16 +52,16 @@ const Collection = ({ sort }) => {
     }, [searchParams, collectionName]);
 
     useEffect(() => {
-        if (initialRenderRef.current) {
-            initialRenderRef.current = false;
+        // if (initialRenderRef.current) {
+        //     initialRenderRef.current = false;
 
-            if (!searchParams.has("page")) {
-                const newParams = new URLSearchParams(searchParams.toString());
-                newParams.set("page", "1");
-                navigate(`?${newParams.toString()}`, { replace: true });
-                return;
-            }
-        }
+        //     if (!searchParams.has("page")) {
+        //         const newParams = new URLSearchParams(searchParams.toString());
+        //         newParams.set("page", "1");
+        //         navigate(`?${newParams.toString()}`, { replace: true });
+        //         return;
+        //     }
+        // }
 
         const currentFilters = { ...filters };
         const prevFilters = { ...lastFiltersRef.current };
@@ -150,18 +150,14 @@ const Collection = ({ sort }) => {
         navigate(`?${newParams.toString()}`, { replace: true });
     };
 
-    const renderLoadingSkeletons = () => {
-        return Array.from({ length: paginationData.limit }).map((_, i) => (
-            <LoadingSkeleton key={i} />
-        ));
-    };
+
     return (
         <div>
-          <SelectedFilters/>
+            <SelectedFilters />
             <div className="t4s_box_pr_grid t4s-products  t4s-text-default t4s_rationt  t4s_position_8 t4s_cover t4s-row  t4s-justify-content-center t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-md-15 t4s-gy-md-15 t4s-gx-10 t4s-gy-10">
-                {loading && products.length === 0 ? (
-                    renderLoadingSkeletons()
-                ) : !loading && products.length === 0 ? (
+                {loading ? (
+                    <div className="w__100 tc mt__40 fwm fs__16">Loading products...</div>
+                ) : products.length === 0 ? (
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
                     products.map((product, i) => (
