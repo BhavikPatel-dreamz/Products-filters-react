@@ -1,6 +1,7 @@
 import React from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import parse from 'html-react-parser';
+
 const SelectedFilters = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ const SelectedFilters = () => {
   const selectedFilters = React.useMemo(() => {
     const filters = {};
     for (const [key, value] of searchParams.entries()) {
-      if (key !== "page" && key !== "collections") {
+      // Exclude non-filter parameters
+      if (key !== "page" && key !== "collections" && key !== "sort") {
         filters[key] = value.includes(",") ? value.split(",") : [value];
       }
     }
@@ -63,14 +65,19 @@ const SelectedFilters = () => {
     navigate(`?${newParams.toString()}`, { replace: true });
   };
 
-
   const clearAllFilters = () => {
     const newParams = new URLSearchParams();
     newParams.set("page", "1");
 
+    // Preserve non-filter parameters
     const collections = searchParams.get("collections");
     if (collections) {
       newParams.set("collections", collections);
+    }
+
+    const sort = searchParams.get("sort");
+    if (sort) {
+      newParams.set("sort", sort);
     }
 
     navigate(`?${newParams.toString()}`, { replace: true });
@@ -93,9 +100,7 @@ const SelectedFilters = () => {
                 removeFilter("price");
               }}
             >
-
               {parse(`${get_currency(selectedFilters.minPrice[0])} - ${get_currency(selectedFilters.maxPrice[0])}`)}
-
             </a>
           )}
 
@@ -123,7 +128,6 @@ const SelectedFilters = () => {
             ));
           })}
         </div>
-
       </div>
 
       {totalFiltersCount > 1 && (

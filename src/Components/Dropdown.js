@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const sortOptions = [
-  { label: "Featured", value: "featured", class: "featured" },
-  { label: "Best selling", value: "best_selling", class: "best-selling" },
   { label: "Alphabetically, A-Z", value: "alphabetical_asc", class: "alphabetically-a-z" },
   { label: "Alphabetically, Z-A", value: "alphabetical_desc", class: "alphabetically-z-a" },
   { label: "Price, low to high", value: "price_asc", class: "price-low-to-high" },
@@ -14,8 +12,8 @@ const sortOptions = [
 
 const Dropdown = ({ setSort }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("Featured");
-  const [selectedKey, setSelectedKey] = useState("featured");
+  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedKey, setSelectedKey] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const dropdownRef = useRef(null);
 

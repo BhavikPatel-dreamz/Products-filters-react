@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import parse from 'html-react-parser';
 
 const ProductItem = ({ product }) => {
   const [addToCart, setAddToCart] = useState(false)
+  const [selectedSize, setSelectedSize] = useState(null);
   const handleImageClick = (product) => {
     window.location.href = `${product.productUrl}`;
   };
@@ -36,7 +36,23 @@ const ProductItem = ({ product }) => {
   const handleAddToCart = () => {
     setAddToCart(true)
   }
-  console.log(product,"product")
+  const handleSizeClick = (size) => {
+    setSelectedSize(size); // update selected size on click
+  };
+
+  function isIdInLocalStorage(id) {
+    const key = 't4s_wis';
+    const data = localStorage.getItem(key);
+
+    if (!data) return false;
+
+    // Convert "id:7553802535107,id:7553802666179" into array of IDs
+    const ids = data.split(',').map(item => item.replace('id:', '').trim());
+
+    return ids.includes(String(id));
+  }
+
+
   return (
     <>
       <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-pr-6716638691523 t4s-col-item is-t4s-pr-created">
@@ -87,35 +103,38 @@ const ProductItem = ({ product }) => {
               <a
                 href="/collections/all-mens/products/mens-kurta-1019-at-011090-gren?_pos=1&_fid=d9fa77533&_ss=c"
                 data-tooltip="left"
-                data-id="4711651278937"
+                data-id=""
                 rel="nofollow"
-                className="t4s-pr-item-btn t4s-pr-wishlist t4s-tooltip-actived"
+                className={`t4s-pr-item-btn t4s-pr-wishlist ${isIdInLocalStorage(product.productId) ? 't4s-tooltip-actived' : ''
+                  }`}
                 data-action-wishlist=""
-                aria-describedby="tooltipt4s146155"
+                aria-describedby=""
               >
                 <span className="t4s-svg-pr-icon">
                   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M21 9C21 12.75 15.72 17.98 12.59 20.53C12.24 20.81 11.75 20.82 11.4 20.55C8.27 18.15 3 13.12 3 9C3 2 12 2 12 8C12 2 21 2 21 9Z"
-                      fill="none"
+                      fill={isIdInLocalStorage(product.productId) ? "#ff0000" : "none"}
                       stroke="#000000"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
                 </span>
-                <span className="t4s-text-pr">Add to Wishlist</span>
+                <span className="t4s-text-pr">
+                Add to Wishlist
+                </span>
               </a>
 
 
               <a
                 href={`/collections/all-mens/products/mens-kurta-1019-at-011090-gren?_pos=1&_fid=d9fa77533&_ss=c`}
                 data-tooltip="left"
-                data-id="4711651278937"
+                data-id=""
                 rel="nofollow"
                 className="t4s-pr-item-btn t4s-pr-quickview t4s-tooltip-actived"
                 data-action-quickview=""
-                aria-describedby="tooltipt4s201326"
+                aria-describedby=""
               >
                 <span className="t4s-svg-pr-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -157,100 +176,6 @@ const ProductItem = ({ product }) => {
           </div>
         </div>
       </div>
-      {
-        addToCart &&
-        <div className="t4s-modal t4s-modal--is-active t4s-opening-qs" aria-hidden="false" tabIndex={-1} role="dialog">
-          <div className="t4s-modal__inner">
-            <div className="t4s-modal__content">
-              <div className="t4s-product-quick-shop initProducts__enabled">
-                <div className="t4s-product-qs-inner">
-                  <h1 className="t4s-product-qs__title" >
-                    <a href="#">
-                      {product.name}
-                    </a>
-                  </h1>
-
-                  <div className="t4s-product-qs__price" style={{ fontSize: "24px", fontWeight: 400, color: "#4f4f4f" }}>
-                    <div className="custom-price-container">
-                      <div className="custom-money-price">
-                        <ins><span className="money">{parse(get_currency(product.price))}</span></ins>
-                        <span className="t4s-badge-price">{Math.round(((product?.compareAtPrice - product?.price) / product?.compareAtPrice) * 100)}% Off</span>
-                      </div>
-                      <div className="custom-compare-price">
-                        <del><span className="money">{parse(get_currency(product.compareAtPrice))}</span></del>
-                      </div>
-                    </div>
-                  </div>
-
-                  <form method="post" action="/cart/add" className="t4s-form__product" encType="multipart/form-data">
-                    <select name="id" className="t4s-product__select t4s-d-none">
-                      <option value="40296450916547">36 (Small)</option>
-                      <option value="40296450949315">38 (Medium)</option>
-                      <option value="40296450982083">40 (Large)</option>
-                      <option value="40296451014851">42 (X-Large)</option>
-                    </select>
-
-                    <div className="t4s-swatch t4s-color-mode__variant_image t4s-selector-mode__circle">
-                      <div className="t4s-swatch__option is-t4s-name__size">
-                        <h4 className="t4s-swatch__title">
-                          Size: <span className="t4s-swatch__current">Choose an option</span>
-                        </h4>
-                        <div className="t4s-swatch__list">
-                         
-                            <div className="t4s-swatch__item" data-value={product?.attributes?.size}>{product?.attributes?.size}</div>
-                        
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="t4s-product-form__buttons">
-                      <div className="t4s-d-flex">
-                        <div className="t4s-quantity-wrapper t4s-product-form__qty">
-                          <button type="button" className="t4s-quantity-selector is--minus">-</button>
-                          <input
-                            type="number"
-                            name="quantity"
-                            defaultValue={1}
-                            min={1}
-                            className="t4s-quantity-input"
-                          />
-                          <button type="button" className="t4s-quantity-selector is--plus">+</button>
-                        </div>
-
-                        <a
-                          href="/products/mens-golden-brocade-jacquard-sherwani-set"
-                          className="t4s-product-form__btn t4s-pr-wishlist"
-                          rel="nofollow"
-                        >
-                          <span className="t4s-svg-pr-icon">
-                            <svg viewBox="0 0 24 24"><use xlinkHref="#t4s-icon-wis" /></svg>
-                          </span>
-                          <span className="t4s-text-pr">Add to Wishlist</span>
-                        </a>
-
-                        <button type="submit" className="t4s-product-form__submit t4s-btn">
-                          <span className="t4s-btn-atc_text">Add to cart</span>
-                          <span className="t4s-loading__spinner" hidden>
-                            <svg width="16" height="16" className="t4s-svg-spinner" viewBox="0 0 66 66">
-                              <circle className="t4s-path" fill="none" strokeWidth="6" cx="33" cy="33" r="30" />
-                            </svg>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-
-                    <input type="hidden" name="product-id" value="6816035471555" />
-                    <input type="hidden" name="section-id" value="template--17869496877251__main-qs" />
-                  </form>
-                </div>
-              </div>
-            </div>
-            <button onClick={() => setAddToCart(false)} data-t4s-modal-close="" title="Close" type="button" class="t4s-modal-close">
-              <svg class="t4s-modal-icon-close" role="presentation" viewBox="0 0 16 14"><path d="M15 0L1 14m14 0L1 0" stroke="currentColor" fill="none" fill-rule="evenodd"></path></svg>
-            </button>
-          </div>
-        </div>
-      }
     </>
   );
 
