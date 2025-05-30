@@ -7,6 +7,7 @@ const ProductItem = ({ product }) => {
     window.location.href = `${product.productUrl}`;
   };
 
+  console.log(product)
   function get_currency(price) {
     const rate = window.Shopify?.currency?.rate || 1;
     const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;
@@ -83,22 +84,22 @@ const ProductItem = ({ product }) => {
               className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived"
               rel="nofollow"
             > */}
-              <a href="#" className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived" data-id={product.variants[0].variantId}>
+              <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")} className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived" data-id={product?.variants?.[0]?.variantId.replace('gid://shopify/ProductVariant/','')} rel="nofollow" data-action-quickshop data-action-addtocart="" aria-describedby="">
                 <span className="t4s-text-pr" onClick={e => {
                   e.preventDefault();
-                }}>Quick Shop</span>
+                }}>Add To cart</span>
               </a>
               {/* </a> */}
             </div>
-
+               
             <div className="t4s-product-btns2">
               <a
-                href="#"
+                href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
                 onClick={e => {
                   e.preventDefault();
                 }}
                 data-tooltip="left"
-                data-id={product.variants[0].variantId}
+                data-id={product.productId}
                 rel="nofollow"
                 className={`t4s-pr-item-btn t4s-pr-wishlist ${isIdInLocalStorage(product.productId) ? 't4s-tooltip-actived' : ''
                   }`}
@@ -123,7 +124,7 @@ const ProductItem = ({ product }) => {
 
 
               <a
-                href="#"
+                href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
                 onClick={e => {
                   e.preventDefault();
                 }}
