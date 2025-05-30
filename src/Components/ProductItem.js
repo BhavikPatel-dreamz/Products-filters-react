@@ -93,7 +93,10 @@ const ProductItem = ({ product }) => {
 
             <div className="t4s-product-btns2">
               <a
-                href="/collections/all-mens/products/mens-kurta-1019-at-011090-gren?_pos=1&_fid=d9fa77533&_ss=c"
+                href="#"
+                onClick={e => {
+                  e.preventDefault();
+                }}
                 data-tooltip="left"
                 data-id={product.variants[0].variantId}
                 rel="nofollow"
@@ -120,7 +123,10 @@ const ProductItem = ({ product }) => {
 
 
               <a
-                href={`/collections/all-mens/products/mens-kurta-1019-at-011090-gren?_pos=1&_fid=d9fa77533&_ss=c`}
+                href="#"
+                onClick={e => {
+                  e.preventDefault();
+                }}
                 data-tooltip="left"
                 data-id={product.variants[0].variantId}
                 rel="nofollow"
