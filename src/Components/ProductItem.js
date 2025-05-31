@@ -32,9 +32,6 @@ const ProductItem = ({ product }) => {
     return html;
   };
 
- 
-  
-
   function isIdInLocalStorage(id) {
     const key = 't4s_wis';
     const data = localStorage.getItem(key);
@@ -78,26 +75,42 @@ const ProductItem = ({ product }) => {
             )}
 
             <div className="t4s-product-btns">
-              {/* <a
-              href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
-              data-id={product.productId}
-              className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived"
-              rel="nofollow"
-            > */}
-              <a href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")} className="t4s-pr-item-btn t4s-pr-addtocart t4s-tooltip-actived" data-id={product?.variants?.[0]?.variantId.replace('gid://shopify/ProductVariant/','')} rel="nofollow" data-action-quickshop data-action-addtocart="" aria-describedby="">
-                <span className="t4s-text-pr" onClick={e => {
-                  e.preventDefault();
-                }}>Add To cart</span>
-              </a>
-              {/* </a> */}
+              <button
+                data-animation-atc='{"ani":"none","time":3000}'
+                id="add-to-cart"
+                type="submit"
+                name="add"
+                className="t4s-product-form__submit t4s-btn t4s-btn-base t4s-btn-style- t4s-btn-color- t4s-w-100 t4s-justify-content-center t4s-btn-loading__svg"
+                data-id={product.variants[0].variantId}
+              >
+                <span className="t4s-btn-atc_text">Add to Cart</span>
+                <span className="t4s-loading__spinner" hidden>
+                  <svg
+                    width="16"
+                    height="16"
+                    className="t4s-svg-spinner"
+                    focusable="false"
+                    role="presentation"
+                    viewBox="0 0 66 66"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      className="t4s-path"
+                      fill="none"
+                      strokeWidth="6"
+                      cx="33"
+                      cy="33"
+                      r="30"
+                    />
+                  </svg>
+                </span>
+              </button>
+
             </div>
-               
+
             <div className="t4s-product-btns2">
               <a
                 href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
-                onClick={e => {
-                  e.preventDefault();
-                }}
                 data-tooltip="left"
                 data-id={product.productId}
                 rel="nofollow"
@@ -118,16 +131,13 @@ const ProductItem = ({ product }) => {
                   </svg>
                 </span>
                 <span className="t4s-text-pr">
-                Add to Wishlist
+                  Add to Wishlist
                 </span>
               </a>
 
 
               <a
                 href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
-                onClick={e => {
-                  e.preventDefault();
-                }}
                 data-tooltip="left"
                 data-id={product.variants[0].variantId}
                 rel="nofollow"

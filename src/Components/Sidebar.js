@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosinstance";
 import FilterSection from "./Filtersidebar";
-import { useDispatch, useSelector } from "react-redux";
-
 
 const Sidebar = () => {
   const [colors, setColors] = useState([]);
@@ -13,18 +11,19 @@ const Sidebar = () => {
   const [productMaterial, setProductMaterial] = useState([]);
   const [gender, setGender] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState({});
-  const [loading, setLoading] = useState(true);
+
   const [enabledFilterConfigs, setEnabledFilterConfigs] = useState([]);
   const [work, setWork] = useState([]);
   const [size, setSize] = useState([]);
   const [fabrics, setFabrics] = useState([]);
   const [price, setPrice] = useState();
-  const dispatch = useDispatch()
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const isFetchingRef = useRef(false);
-  const prevSearchParamsRef = useRef('');
+
+  // Add ref to track last query string to prevent duplicate API calls
+  const lastQueryStringRef = useRef('');
 
   const filters = useMemo(() => {
     const result = {};
@@ -36,7 +35,6 @@ const Sidebar = () => {
 
   useEffect(() => {
     const collectionElement = document.getElementById("collection");
-
     const enabledFilters = collectionElement?.dataset?.enabledFilters;
     const filterOrder = collectionElement?.dataset?.filterOrder;
 
@@ -73,20 +71,11 @@ const Sidebar = () => {
     }
 
     setEnabledFilterConfigs(filteredConfigs);
-  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work]);
+  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work,price]);
 
   const fetchFilters = async () => {
-    // if (isFetchingRef.current) return;
-    // const currentSearchParamsString = searchParams.toString();
-    // if (currentSearchParamsString === prevSearchParamsRef.current) return;
-    // prevSearchParamsRef.current = currentSearchParamsString;
-
     try {
-      isFetchingRef.current = true;
-      setLoading(true);
-
       const queryParams = new URLSearchParams();
-
       Object.entries(filters).forEach(([key, value]) => {
         // Only add parameters that have actual values
         if (value !== undefined && value !== null && value !== '') {
@@ -105,8 +94,19 @@ const Sidebar = () => {
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
+      
+      // Create the final query string
+      const queryString = queryParams.toString();
+      
+      // Check if this is the same query as the last one
+      if (lastQueryStringRef.current === queryString) {
+        return; // Don't make the API call if it's the same query
+      }
+      
+      // Update the ref with current query string
+      lastQueryStringRef.current = queryString;
 
-      const response = await axiosInstance.get(`/products/filters?${queryParams.toString()}`);
+      const response = await axiosInstance.get(`/products/filters?${queryString}`);
       const data = response.data.data;
       setColors(data?.attributes?.colors);
       setProductTypes(data?.productTypes);
@@ -120,13 +120,8 @@ const Sidebar = () => {
       setPrice(data.priceRange);
     } catch (err) {
       console.error("Failed to fetch filters:", err);
-    } finally {
-      setLoading(false);
-      // Reset the fetching flag
-      isFetchingRef.current = false;
     }
   };
-
 
   useEffect(() => {
     fetchFilters();
@@ -169,7 +164,6 @@ const Sidebar = () => {
       updateFilters(newFilters);
       return newFilters;
     });
-
   };
 
   const updateFilters = (newFilters) => {
@@ -189,11 +183,9 @@ const Sidebar = () => {
       }
     });
 
-    // Always remove minPrice and maxPrice when checkbox is changed
     updatedParams.delete('minPrice');
     updatedParams.delete('maxPrice');
 
-    // Ensure we don't create a navigation loop
     if (updatedParams.toString() !== location.search.replace('?', '')) {
       navigate(`?${updatedParams.toString()}`, { replace: true });
     }

@@ -17,8 +17,6 @@ const Dropdown = ({ setSort }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const dropdownRef = useRef(null);
 
-  const toggleDropdown = () => setIsOpen(prev => !prev);
-
   const handleSelectItem = (label, sortValue) => {
     setSelectedValue(label);
     setSelectedKey(sortValue);
@@ -44,20 +42,19 @@ const Dropdown = ({ setSort }) => {
     }
   }, [searchParams, setSort]);
 
-  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
+  
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+  
   return (
-    <div ref={dropdownRef} className={`t4s-dropdown t4s-dropdown__sortby t4s-col-item t4s-col-md-6 t4s-col-6${isOpen ? " is--opened" : ""}`}>
+    <div ref={dropdownRef} className={`t4s-dropdown t4s-dropdown__sortby t4s-col-item t4s-col-md-6 t4s-col-6`}>
       <button  data-dropdown-open=""
         data-position="bottom-end"
         data-id="t4s__sortby"
