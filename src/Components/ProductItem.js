@@ -74,17 +74,16 @@ const ProductItem = ({ product }) => {
               </div>
             )}
 
-            <div className="t4s-product-btns">
+            <div className="custom-atc-grid t4s-product-btns">
               <button
                 data-animation-atc='{"ani":"none","time":3000}'
-                id="add-to-cart"
                 type="submit"
                 name="add"
-                className="t4s-product-form__submit t4s-btn t4s-btn-base t4s-btn-style- t4s-btn-color- t4s-w-100 t4s-justify-content-center t4s-btn-loading__svg"
+                className="custom-atc-grid t4s-product-form__submit t4s-btn t4s-btn-base t4s-btn-style- t4s-btn-color- t4s-w-100 t4s-justify-content-center t4s-btn-loading__svg"
                 data-id={product.variants[0].variantId.split('/').pop()}
               >
-                <span className="t4s-btn-atc_text">Add to Cart</span>
-                <span className="t4s-loading__spinner" hidden>
+                <span className="custom-atc-grid t4s-btn-atc_text">Add to Cart</span>
+                <span className="custom-atc-grid t4s-loading__spinner" hidden>
                   <svg
                     width="16"
                     height="16"
