@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-/>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -28,18 +23,121 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
-    <script>
-      function getPrice($price){
-        return ($price*100)
+  <title>React App</title>
+  <script>
+    function getPrice($price) {
+      return ($price * 100)
+    }
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      var isALARendered;
+      function ALAcheck() {
+        isALARendered = setInterval(function () {
+          customALA()
+        }, 200);
       }
-    </script>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    
-    <div id="collection"  
+      ALAcheck();
+      function customALA() {
+        var selectorAll = document.querySelectorAll('.custom-atc-grid');
+        // selectorAll.forEach((selector) => {
+        if (selectorAll.length > 0) {
+          clearInterval(isALARendered);
+          const customCollATC = document.querySelectorAll(".custom-atc-grid");
+          customCollATC.forEach((customATC) => {
+            customATC.addEventListener("click", function (e) {
+              event.preventDefault(); // Prevent form submission
+              console.log(customATC.getAttribute("data-id", "variant-id........"));
+              const varID = customATC.getAttribute("data-id");
+
+              let formData = {
+                'items': [{
+                  'id': varID,
+                  'quantity': 1
+                }]
+              };
+
+              fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+              })
+                .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                      throw new Error(errorData.message || 'Failed to add to cart');
+                    });
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log("Added to cart:", data);
+
+                  //Refresh cart with custom event
+                  setTimeout(() => {
+                    document.documentElement.classList.remove("is-header--stuck");
+                    const overlay = document.querySelector(".t4s-close-overlay.t4s-op-0");
+                    if (overlay) {
+                      overlay.classList.add("is--visible");
+                    }
+                    document.getElementsByTagName("body")[0].classList.add("t4s-lock-scroll", "is--opend-drawer");
+                    const cartDrawer = document.getElementById("t4s-mini_cart");
+                    cartDrawer.setAttribute("aria-hidden", false);
+                    document.dispatchEvent(new CustomEvent("cart:refresh"));
+                  }, 1400)
+                  // Optionally show success message or redirect
+                })
+                .catch(error => {
+                  console.error("Add to cart failed:", error);
+                  // Optionally show error UI
+                });
+
+            })
+          })
+
+          document.querySelectorAll(".t4s-drawer__close").forEach(closeBtn => {
+            closeBtn.addEventListener("click", function () {
+              // Remove classes from <body>
+              document.body.classList.remove("t4s-lock-scroll", "is--opend-drawer");
+
+              // Hide the mini cart
+              const cartDrawer = document.getElementById("t4s-mini_cart");
+              const overlay = document.querySelector(".t4s-close-overlay.t4s-op-0");
+              if (cartDrawer && overlay) {
+                cartDrawer.setAttribute("aria-hidden", "true");
+                overlay.classList.remove("is--visible");
+              }
+            });
+          });
+
+          document.querySelectorAll(".t4s-close-overlay.t4s-op-0").forEach(closeBtn => {
+            closeBtn.addEventListener("click", function () {
+              document.body.classList.remove("t4s-lock-scroll", "is--opend-drawer");
+
+              // Hide the mini cart
+              const cartDrawer = document.getElementById("t4s-mini_cart");
+              const overlay = document.querySelector(".t4s-close-overlay.t4s-op-0");
+              if (cartDrawer && overlay) {
+                cartDrawer.setAttribute("aria-hidden", "true");
+                overlay.classList.remove("is--visible");
+              }
+            });
+          });
+        }
+        // })
+      }
+    })
+  </script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+
+  <div id="collection"
     className="t4s-section-inner t4s-row t4s_nt_se_template--17869496025283__main t4s_se_template--17869496025283__main t4s-container-fluid "
     style="
         margin-right: auto;
@@ -48,17 +146,11 @@
         padding-left: 60px;
         padding-top: 20px;
         padding-bottom: 20px;
-     "
-    data-collection="All"
-    data-title="Gowns"
+     " data-collection="all-mens" data-title="Gowns"
     data-enabled-filters="price,genders,productGroups,brands,colors,fabrics,productTypes,style,availability,works,size"
-    data-filter-order="price,brand,colors"
-    data-base-path="/pages/test-filter"
-    data-show-filters="true"
-    data-show-sort="true"
-    data-items-per-page="4"
-    data-show-pagination="true"></div>
-    <!--
+    data-filter-order="price,brand,colors" data-base-path="/pages/test-filter" data-show-filters="true"
+    data-show-sort="true" data-items-per-page="4" data-show-pagination="true"></div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -68,5 +160,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+</body>
+
 </html>
