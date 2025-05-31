@@ -81,7 +81,7 @@ const ProductItem = ({ product }) => {
                 type="submit"
                 name="add"
                 className="t4s-product-form__submit t4s-btn t4s-btn-base t4s-btn-style- t4s-btn-color- t4s-w-100 t4s-justify-content-center t4s-btn-loading__svg"
-                data-id={product.variants[0].variantId}
+                data-id={product.variants[0].variantId.split('/').pop()}
               >
                 <span className="t4s-btn-atc_text">Add to Cart</span>
                 <span className="t4s-loading__spinner" hidden>
@@ -105,14 +105,13 @@ const ProductItem = ({ product }) => {
                   </svg>
                 </span>
               </button>
-
             </div>
 
             <div className="t4s-product-btns2">
               <a
                 href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
                 data-tooltip="left"
-                data-id={product.productId}
+                data-id={product.variants[0].variantId.split('/').pop()}
                 rel="nofollow"
                 className={`t4s-pr-item-btn t4s-pr-wishlist ${isIdInLocalStorage(product.productId) ? 't4s-tooltip-actived' : ''
                   }`}
@@ -139,7 +138,7 @@ const ProductItem = ({ product }) => {
               <a
                 href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
                 data-tooltip="left"
-                data-id={product.variants[0].variantId}
+                data-id={product.variants[0].variantId.split('/').pop()}
                 rel="nofollow"
                 className="t4s-pr-item-btn t4s-pr-quickview t4s-tooltip-actived"
                 data-action-quickview=""
@@ -157,10 +156,11 @@ const ProductItem = ({ product }) => {
 
             </div>
 
-            <a
-              href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
-              className="t4s-full-width-link is--href-replaced"
-            />
+            {/* <button type="submit" data-id={product.variants[0].variantId.split('/').pop()}
+              className="t4s-full-width-link is--href-replaced" data-animation-atc='{"ani":"none","time":3000}'
+              id="add-to-cart"
+              name="add"
+            /> */}
           </div>
 
           <div className="t4s-product-info">
