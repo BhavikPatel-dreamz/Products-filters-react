@@ -51,17 +51,6 @@ const Collection = ({ sort }) => {
     }, [searchParams, collectionName]);
 
     useEffect(() => {
-        // if (initialRenderRef.current) {
-        //     initialRenderRef.current = false;
-
-        //     if (!searchParams.has("page")) {
-        //         const newParams = new URLSearchParams(searchParams.toString());
-        //         newParams.set("page", "1");
-        //         navigate(`?${newParams.toString()}`, { replace: true });
-        //         return;
-        //     }
-        // }
-
         const currentFilters = { ...filters };
         const prevFilters = { ...lastFiltersRef.current };
 
@@ -144,6 +133,103 @@ const Collection = ({ sort }) => {
 
 
     const changePage = (newPage) => {
+        var isALARendered;
+      function ALAcheck() {
+        isALARendered = setInterval(function () {
+          customALA()
+        }, 200);
+      }
+      ALAcheck();
+      function customALA() {
+        var selectorAll = document.querySelectorAll('.custom-atc-grid');
+        // selectorAll.forEach((selector) => {
+        if (selectorAll.length > 0) {
+          clearInterval(isALARendered);
+          const customCollATC = document.querySelectorAll(".custom-atc-grid");
+          customCollATC.forEach((customATC) => {
+            customATC.addEventListener("click", function (e) {
+              e.preventDefault(); // Prevent form submission
+              console.log(customATC.getAttribute("data-id", "variant-id........"));
+              const varID = customATC.getAttribute("data-id");
+
+              let formData = {
+                'items': [{
+                  'id': varID,
+                  'quantity': 1
+                }]
+              };
+
+              fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+              })
+                .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                      throw new Error(errorData.message || 'Failed to add to cart');
+                    });
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log("Added to cart:", data);
+
+                  //Refresh cart with custom event
+                  setTimeout(() => {
+                    document.documentElement.classList.remove("is-header--stuck");
+                    const overlay = document.querySelector(".t4s-close-overlay.t4s-op-0");
+                    if (overlay) {
+                      overlay.classList.add("is--visible");
+                    }
+                    document.getElementsByTagName("body")[0].classList.add("t4s-lock-scroll", "is--opend-drawer");
+                    const cartDrawer = document.getElementById("t4s-mini_cart");
+                    cartDrawer.setAttribute("aria-hidden", false);
+                    document.dispatchEvent(new CustomEvent("cart:refresh"));
+                  }, 1400)
+                  // Optionally show success message or redirect
+                })
+                .catch(error => {
+                  console.error("Add to cart failed:", error);
+                  // Optionally show error UI
+                });
+
+            })
+          })
+
+          document.querySelectorAll(".t4s-drawer__close").forEach(closeBtn => {
+            closeBtn.addEventListener("click", function () {
+              // Remove classes from <body>
+              document.body.classList.remove("t4s-lock-scroll", "is--opend-drawer");
+
+              // Hide the mini cart
+              const cartDrawer = document.getElementById("t4s-mini_cart");
+              const overlay = document.querySelector(".t4s-close-overlay.t4s-op-0");
+              if (cartDrawer && overlay) {
+                cartDrawer.setAttribute("aria-hidden", "true");
+                overlay.classList.remove("is--visible");
+              }
+            });
+          });
+
+          document.querySelectorAll(".t4s-close-overlay.t4s-op-0").forEach(closeBtn => {
+            closeBtn.addEventListener("click", function () {
+              document.body.classList.remove("t4s-lock-scroll", "is--opend-drawer");
+
+              // Hide the mini cart
+              const cartDrawer = document.getElementById("t4s-mini_cart");
+              const overlay = document.querySelector(".t4s-close-overlay.t4s-op-0");
+              if (cartDrawer && overlay) {
+                cartDrawer.setAttribute("aria-hidden", "true");
+                overlay.classList.remove("is--visible");
+              }
+            });
+          });
+        }
+        // })
+      }
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set("page", newPage.toString());
         navigate(`?${newParams.toString()}`, { replace: true });

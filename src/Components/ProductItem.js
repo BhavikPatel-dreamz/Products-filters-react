@@ -7,7 +7,6 @@ const ProductItem = ({ product }) => {
     window.location.href = `${product.productUrl}`;
   };
 
-  console.log(product)
   function get_currency(price) {
     const rate = window.Shopify?.currency?.rate || 1;
     const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;

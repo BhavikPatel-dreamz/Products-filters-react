@@ -18,17 +18,13 @@ const ProductCardSkeleton = () => {
                     <div className="t4s-product-btns">
                         <div className="skeleton-button add-to-cart-btn"></div>
                     </div>
+                    
                     {/* Badge Skeleton */}
-                   <div style={{display:"flex", justifyContent:"space-between"}}>
-                   <div className="t4s-product-badge">
-                        <span className="skeleton-badge"></span>
+                    <div style={{display:"flex", justifyContent:"space-between"}}>
+                        <div className="t4s-product-badge">
+                            <span className="skeleton-badge"></span>
+                        </div>
                     </div>
-
-                    {/* <div className="t4s-product-btns2">
-                        <div className="skeleton-icon-button"></div>
-                        <div className="skeleton-icon-button"></div>
-                    </div> */}
-                   </div>
                 </div>
 
                 {/* Product Info Skeleton */}
@@ -127,12 +123,14 @@ const ProductCardSkeleton = () => {
         .skeleton-title-line-2 {
           width: 70%;
           height: 18px;
+          margin-bottom: 0;
         }
 
         .skeleton-price {
           width: 50%;
           height: 20px;
           margin-top: 8px;
+          margin-bottom: 0;
         }
 
         @keyframes loading {
@@ -144,7 +142,7 @@ const ProductCardSkeleton = () => {
           }
         }
 
-        /* Container styles to match original */
+        /* Container styles to match original with proper spacing */
         .t4s-product {
           position: relative;
           border: 1px solid #e5e5e5;
@@ -152,22 +150,27 @@ const ProductCardSkeleton = () => {
           overflow: hidden;
           background: white;
           max-width: 300px;
-          margin: 0 auto;
+          margin: 16px auto;
+          box-sizing: border-box;
+       
         }
 
         .t4s-product-wrapper {
           padding: 0;
+          height: 100%;
         }
 
         .t4s-product-inner {
           position: relative;
+          height: 300px;
         }
 
         .t4s-product-img {
           position: relative;
           overflow: hidden;
           background: #f9f9f9;
-          height: 300px;
+          height: 100%;
+          width: 100%;
         }
 
         .t4s-product-badge {
@@ -199,17 +202,22 @@ const ProductCardSkeleton = () => {
 
         .t4s-product-info {
           padding: 16px;
+          background: white;
+          min-height: 120px;
+          box-sizing: border-box;
         }
 
         .t4s-product-info__inner {
           display: flex;
           flex-direction: column;
           gap: 8px;
+          height: 100%;
         }
 
         .t4s-product-vendor {
           font-size: 12px;
           opacity: 0.7;
+          height: 14px;
         }
 
         .t4s-product-title {
@@ -217,11 +225,27 @@ const ProductCardSkeleton = () => {
           font-size: 16px;
           font-weight: 500;
           line-height: 1.3;
+          height: 48px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
         }
 
         .t4s-product-price {
           font-weight: 600;
           font-size: 18px;
+          height: 20px;
+          margin-top: auto;
+        }
+
+        /* Demo container to show multiple skeletons */
+        .skeleton-demo {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 24px;
+          padding: 24px;
+          max-width: 1200px;
+          margin: 0 auto;
         }
       `}</style>
         </div>
