@@ -79,7 +79,7 @@ const ProductItem = ({ product }) => {
                 type="submit"
                 name="add"
                 className="custom-atc-grid t4s-product-form__submit t4s-btn t4s-btn-base t4s-btn-style- t4s-btn-color- t4s-w-100 t4s-justify-content-center t4s-btn-loading__svg"
-                data-id={product.variants[0].variantId.split('/').pop()}
+                onClick={window?.addCart(product.variants[0].variantId.split('/').pop())}
               >
                 <span className="custom-atc-grid t4s-btn-atc_text">Add to Cart</span>
                 <span className="custom-atc-grid t4s-loading__spinner" hidden>
