@@ -169,7 +169,7 @@ const Collection = ({ sort }) => {
                 .then(response => {
                   if (!response.ok) {
                     return response.json().then(errorData => {
-                      throw new Error(errorData.message || 'Failed to add to cart');
+                      // throw new Error(errorData.message || 'Failed to add to cart');
                     });
                   }
                   return response.json();

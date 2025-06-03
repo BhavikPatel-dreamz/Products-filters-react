@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProductCardSkeleton = () => {
     return (
-        <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-col-item">
+        <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-col-item" style={{paddingTop:"10px"}}>
             <div className="t4s-product-wrapper">
                 <div className="t4s-product-inner t4s-pr t4s-oh">
                     {/* Product Image Skeleton */}

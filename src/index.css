@@ -5187,6 +5187,9 @@ shopify-payment-terms {
 .t4s-facets__form .t4s-facet ul {
   padding: 0;
   margin: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  overflow-x: unset;
 }
 .t4s-facets__form .t4s-facet ul li {
   line-height: 25px;
