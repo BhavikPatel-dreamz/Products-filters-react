@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import parse from 'html-react-parser';
 
 const ProductItem = ({ product }) => {
+  const [loading, setLoading] = useState(false);
   const handleImageClick = (product) => {
     window.location.href = `${product.productUrl}`;
   };
@@ -17,6 +18,16 @@ const ProductItem = ({ product }) => {
     }
 
     return formatMoney((price * 100) * rate);
+  }
+  const addToCart = (variant) => {
+   
+    if (typeof window?.addCart !== "function") {
+      return null
+    }
+    else {
+      setLoading(true);
+      return window?.addCart(variant)
+    }
   }
 
   // Generate the price HTML string
@@ -78,11 +89,11 @@ const ProductItem = ({ product }) => {
                 data-animation-atc='{"ani":"none","time":3000}'
                 type="submit"
                 name="add"
+                style={{ display: "flex", gap: "5px" }}
                 className="custom-atc-grid t4s-product-form__submit t4s-btn t4s-btn-base t4s-btn-style- t4s-btn-color- t4s-w-100 t4s-justify-content-center t4s-btn-loading__svg"
-                onClick={window?.addCart(product.variants[0].variantId.split('/').pop())}
+                onClick={() => addToCart(product.variants[0].variantId.split("/").pop())}
               >
-                <span className="custom-atc-grid t4s-btn-atc_text">Add to Cart</span>
-                <span className="custom-atc-grid t4s-loading__spinner" hidden>
+                <span className="custom-atc-grid t4s-loading__spinner" style={{ display: loading ? "block" : "none" }}>
                   <svg
                     width="16"
                     height="16"
@@ -102,6 +113,7 @@ const ProductItem = ({ product }) => {
                     />
                   </svg>
                 </span>
+                <span className="custom-atc-grid t4s-btn-atc_text">Add to Cart</span>
               </button>
             </div>
 
@@ -154,11 +166,7 @@ const ProductItem = ({ product }) => {
 
             </div>
 
-            {/* <button type="submit" data-id={product.variants[0].variantId.split('/').pop()}
-              className="t4s-full-width-link is--href-replaced" data-animation-atc='{"ani":"none","time":3000}'
-              id="add-to-cart"
-              name="add"
-            /> */}
+           
           </div>
 
           <div className="t4s-product-info">
