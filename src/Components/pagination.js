@@ -26,8 +26,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
   
           {/* Prev Button */}
           <li>
-            <a
-              href="#"
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 currentPage > 1 && onPageChange(currentPage - 1);
@@ -47,7 +46,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
               >
                 <path d="M6 6L0 11.1962L0 0.803848L6 6Z" fill="currentColor"></path>
               </svg>
-            </a>
+            </button>
           </li>
   
           {/* Page Numbers */}
@@ -58,8 +57,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
               ) : currentPage === page ? (
                 <span className="t4s-pagination__item pagination__item--current">{page}</span>
               ) : (
-                <a
-                  href="#"
+                <button
                   className="t4s-pagination__item link"
                   onClick={(e) => {
                     e.preventDefault();
@@ -67,15 +65,14 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
                   }}
                 >
                   {page}
-                </a>
+                </button>
               )}
             </li>
           ))}
   
           {/* Next Button */}
           <li>
-            <a
-              href="#"
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 currentPage < totalPages && onPageChange(currentPage + 1);
@@ -87,7 +84,7 @@ const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
               <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6 6L0 11.1962L0 0.803848L6 6Z" fill="currentColor"></path>
               </svg>
-            </a>
+            </button>
           </li>
         </ul>
       </nav>

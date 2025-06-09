@@ -9,16 +9,29 @@ const ProductItem = ({ product }) => {
   };
 
   function get_currency(price) {
-    const rate = window.Shopify?.currency?.rate || 1;
-    const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;
-
+    // Try to get currency data from BOLD first, fallback to Shopify
+    const boldCurrency = window?.BOLD?.common?.Shopify?.cart?.currency;
+    const shopifyCurrency = window?.Shopify?.currency;
+    
+    // Get exchange rate from BOLD or Shopify
+    const rate = boldCurrency?.rate || shopifyCurrency?.rate || 1;
+    
+    // Get format function from BOLD
+    const formatMoney = window?.BOLD?.common?.Shopify?.formatMoney;
+    
     if (typeof formatMoney !== 'function') {
-      console.warn('formatMoney function is not available.');
-      return ((price * 100) * rate).toFixed(2);
+      console.warn('BOLD formatMoney function is not available.');
+      
+      // Fallback formatting - you might want to use the currency code from BOLD
+      const currencyCode = boldCurrency?.active || shopifyCurrency?.active || '';
+      const formattedPrice = ((price * 100) * rate).toFixed(2);
+      
+      return `${formattedPrice} ${currencyCode}`;
     }
-
+    
     return formatMoney((price * 100) * rate);
   }
+
   const addToCart = (variant) => {
    
     if (typeof window?.addCart !== "function") {

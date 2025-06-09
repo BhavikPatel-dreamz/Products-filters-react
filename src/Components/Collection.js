@@ -147,7 +147,7 @@ const Collection = ({ sort }) => {
                     Array.from({ length: Number(paginationData.limit) || 10 }).map((_, index) => (
                         <ProductCardSkeleton key={index} />
                     ))
-                ) : paginationData.limit === 0 ? (
+                ) : products.length === 0 ? (
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
                     products.map((product, i) => (
