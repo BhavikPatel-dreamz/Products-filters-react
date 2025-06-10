@@ -11,7 +11,7 @@ const ProductItem = ({ product }) => {
   function get_currency(price) {
     const rate = window.Shopify?.currency?.rate || 1;
     const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;
-    const currency = window?.BOLD?.common?.Shopify?.cart?.currency 
+    const currency = window?.BOLD?.common?.Shopify?.cart?.currency
     if (typeof formatMoney !== 'function') {
       console.warn('formatMoney function is not available.');
       return ((price * 100) * rate).toFixed(2);
@@ -21,7 +21,7 @@ const ProductItem = ({ product }) => {
 
 
   const addToCart = (variant) => {
-   
+
     if (typeof window?.addCart !== "function") {
       return null
     }
@@ -43,17 +43,17 @@ const ProductItem = ({ product }) => {
     return html;
   };
 
-  function isIdInLocalStorage(id) {
-    const key = 't4s_wis';
-    const data = localStorage.getItem(key);
+  // function isIdInLocalStorage(id) {
+  //   const key = 't4s_wis';
+  //   const data = localStorage.getItem(key);
 
-    if (!data) return false;
+  //   if (!data) return false;
 
-    // Convert "id:7553802535107,id:7553802666179" into array of IDs
-    const ids = data.split(',').map(item => item.replace('id:', '').trim());
+  //   // Convert "id:7553802535107,id:7553802666179" into array of IDs
+  //   const ids = data.split(',').map(item => item.replace('id:', '').trim());
 
-    return ids.includes(String(id));
-  }
+  //   return ids.includes(String(id));
+  // }
 
   return (
     <>
@@ -124,20 +124,13 @@ const ProductItem = ({ product }) => {
                 data-tooltip="left"
                 data-id={product.variants[0].variantId.split('/').pop()}
                 rel="nofollow"
-                className={`t4s-pr-item-btn t4s-pr-wishlist ${isIdInLocalStorage(product.productId) ? 't4s-tooltip-actived' : ''
-                  }`}
+                className={`t4s-pr-item-btn t4s-pr-wishlist t4s-tooltip-actived`}
                 data-action-wishlist=""
                 aria-describedby=""
               >
                 <span className="t4s-svg-pr-icon">
-                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M21 9C21 12.75 15.72 17.98 12.59 20.53C12.24 20.81 11.75 20.82 11.4 20.55C8.27 18.15 3 13.12 3 9C3 2 12 2 12 8C12 2 21 2 21 9Z"
-                      fill={isIdInLocalStorage(product.productId) ? "#ff0000" : "none"}
-                      stroke="#000000"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.0213 2.94287C8.91509 2.94287 7.94652 3.41859 7.34277 4.22269C6.73902 3.41859 5.77045 2.94287 4.6642 2.94287C3.78361 2.94386 2.93937 3.29412 2.31669 3.91679C1.69402 4.53946 1.34377 5.38371 1.34277 6.2643C1.34277 10.0143 6.90295 13.0497 7.13974 13.175C7.20215 13.2086 7.27191 13.2262 7.34277 13.2262C7.41364 13.2262 7.4834 13.2086 7.54581 13.175C7.78259 13.0497 13.3428 10.0143 13.3428 6.2643C13.3418 5.38371 12.9915 4.53946 12.3689 3.91679C11.7462 3.29412 10.9019 2.94386 10.0213 2.94287ZM7.34277 12.3072C6.36456 11.7372 2.19992 9.14055 2.19992 6.2643C2.20077 5.61099 2.46067 4.98468 2.92263 4.52273C3.38459 4.06077 4.01089 3.80086 4.6642 3.80001C5.70617 3.80001 6.58099 4.35501 6.94634 5.24644C6.97863 5.32505 7.03356 5.39228 7.10415 5.43959C7.17474 5.48691 7.2578 5.51217 7.34277 5.51217C7.42775 5.51217 7.51081 5.48691 7.5814 5.43959C7.65199 5.39228 7.70691 5.32505 7.7392 5.24644C8.10456 4.35341 8.97938 3.80001 10.0213 3.80001C10.6747 3.80086 11.301 4.06077 11.7629 4.52273C12.2249 4.98468 12.4848 5.61099 12.4856 6.2643C12.4856 9.13626 8.31992 11.7366 7.34277 12.3072Z" fill="currentColor" />
                   </svg>
                 </span>
                 <span className="t4s-text-pr">
@@ -163,11 +156,7 @@ const ProductItem = ({ product }) => {
                 </span>
                 <span className="t4s-text-pr">Quick view</span>
               </a>
-
-
             </div>
-
-           
           </div>
 
           <div className="t4s-product-info">
