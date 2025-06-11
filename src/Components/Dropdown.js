@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const sortOptions = [
+  { label: "Newest", value: "date_new_to_old", class: "date-new-to-old" },
   { label: "Alphabetically, A-Z", value: "alphabetical_asc", class: "alphabetically-a-z" },
   { label: "Alphabetically, Z-A", value: "alphabetical_desc", class: "alphabetically-z-a" },
   { label: "Price, low to high", value: "price_asc", class: "price-low-to-high" },
   { label: "Price, high to low", value: "price_high", class: "price-high-to-low" },
   { label: "Date, old to new", value: "date_old_to_new", class: "date-old-to-new" },
-  { label: "Date, new to old", value: "date_new_to_old", class: "date-new-to-old" },
 ];
 
 const Dropdown = ({ setSort }) => {
