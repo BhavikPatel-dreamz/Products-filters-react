@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 const sortOptions = [
   { label: "Newest", value: "date_new_to_old", class: "date-new-to-old" },
+  { label: "Best Seller", value: "best_seller", class: "date-new-to-old" },
   { label: "Alphabetically, A-Z", value: "alphabetical_asc", class: "alphabetically-a-z" },
   { label: "Alphabetically, Z-A", value: "alphabetical_desc", class: "alphabetically-z-a" },
   { label: "Price, low to high", value: "price_asc", class: "price-low-to-high" },
@@ -15,7 +16,7 @@ const Dropdown = ({ setSort }) => {
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedKey, setSelectedKey] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
-  const dropdownRef = useRef(null);
+  // const dropdownRef = useRef(null);
 
   const handleSelectItem = (label, sortValue) => {
     setSelectedValue(label);
@@ -42,23 +43,23 @@ const Dropdown = ({ setSort }) => {
     }
   }, [searchParams, setSort]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setIsOpen(false);
+  //     }
+  //   };
   
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
   
   return (
-    <div ref={dropdownRef} className={`t4s-dropdown t4s-dropdown__sortby t4s-col-item t4s-col-md-6 t4s-col-6`}>
+    <div  className={`t4s-dropdown t4s-dropdown__sortby t4s-col-item t4s-col-md-6 t4s-col-6`}>
       <button  data-dropdown-open=""
         data-position="bottom-end"
         data-id="t4s__sortby"
-        className=""
+        className=""      
         onClick={() => setIsOpen(prev => !prev)}
 >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
