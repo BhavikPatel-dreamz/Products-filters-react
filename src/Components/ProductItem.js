@@ -43,18 +43,6 @@ const ProductItem = ({ product }) => {
     return html;
   };
 
-  // function isIdInLocalStorage(id) {
-  //   const key = 't4s_wis';
-  //   const data = localStorage.getItem(key);
-
-  //   if (!data) return false;
-
-  //   // Convert "id:7553802535107,id:7553802666179" into array of IDs
-  //   const ids = data.split(',').map(item => item.replace('id:', '').trim());
-
-  //   return ids.includes(String(id));
-  // }
-
   return (
     <>
       <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-pr-6716638691523 t4s-col-item is-t4s-pr-created">
@@ -122,7 +110,8 @@ const ProductItem = ({ product }) => {
               <a
                 href={product.productUrl.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
                 data-tooltip="left"
-                data-id={product.variants[0].variantId.split('/').pop()}
+                // data-id={product.variants[0].variantId.split('/').pop()}
+                data-id={product.productId}
                 rel="nofollow"
                 className={`t4s-pr-item-btn t4s-pr-wishlist t4s-tooltip-actived`}
                 data-action-wishlist=""
