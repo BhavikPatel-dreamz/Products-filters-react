@@ -141,9 +141,7 @@ const ProductItem = ({ product }) => {
                   </svg>
                 </span>
                 <span className="custom-atc-grid t4s-btn-atc_text">Add to Cart</span>
-              </a>
-
-              
+              </a>           
                 
                 </> }
 
