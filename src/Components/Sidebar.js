@@ -106,6 +106,12 @@ const Sidebar = () => {
         queryParams.set("collections", collectionName);
       }
       
+
+      // remove some unnecessary parameters
+      queryParams.delete("page");
+      queryParams.delete("sort");
+      
+
       // Create the final query string
       const queryString = queryParams.toString();
       
