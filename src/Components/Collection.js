@@ -28,7 +28,6 @@ const Collection = ({ sort }) => {
 
     const lastFiltersRef = useRef({});
     const lastFetchParamsRef = useRef(null);
-    const abortControllerRef = useRef(null);
 
     useEffect(() => {
         setShowPagination(showPaginationAttr === "true");
@@ -90,14 +89,6 @@ const Collection = ({ sort }) => {
 
 
     const fetchData = useCallback(async () => {
-        // Abort previous request if it exists
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-        }
-        // Create a new AbortController for this request
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
-
         const queryParams = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
             queryParams.set(key, Array.isArray(value) ? value.join(",") : value);
@@ -117,10 +108,7 @@ const Collection = ({ sort }) => {
         setProducts([]);
 
         try {
-            const response = await axiosInstance.get(
-                `/products?${queryString}`,
-                { signal: controller.signal }
-            );
+            const response = await axiosInstance.get(`/products?${queryString}`);
             if (response.data?.data) {
                 setProducts(response.data.data.products || []);
                 setPaginationData(prev => ({
@@ -131,10 +119,6 @@ const Collection = ({ sort }) => {
                 }));
             }
         } catch (err) {
-            if (err.name === "CanceledError" || err.name === "AbortError") {
-                // Request was canceled, do nothing
-                return;
-            }
             console.error("Error fetching products:", err);
         } finally {
             setLoading(false);

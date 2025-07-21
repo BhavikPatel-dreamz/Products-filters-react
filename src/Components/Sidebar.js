@@ -25,9 +25,6 @@ const Sidebar = () => {
   // Add ref to track last query string to prevent duplicate API calls
   const lastQueryStringRef = useRef('');
 
-  // Add a ref to store the current AbortController
-  const abortControllerRef = useRef(null);
-
   const filters = useMemo(() => {
     const result = {};
     for (const [key, value] of searchParams.entries()) {
@@ -78,14 +75,6 @@ const Sidebar = () => {
 
   const fetchFilters = async () => {
     try {
-      // Abort previous request if it exists
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      // Create a new AbortController for this request
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
-
       const queryParams = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         // Only add parameters that have actual values
@@ -105,12 +94,17 @@ const Sidebar = () => {
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
-      
 
-      // remove some unnecessary parameters
+      //remove page from query params if it exists
       queryParams.delete("page");
-      queryParams.delete("sort");
-      
+
+      // Check if sort is present in searchParams and add it to queryParams
+      const sort = searchParams.get("sort");
+      if (sort) {
+        queryParams.set("sort", sort);
+      }
+
+    
 
       // Create the final query string
       const queryString = queryParams.toString();
@@ -123,10 +117,9 @@ const Sidebar = () => {
       // Update the ref with current query string
       lastQueryStringRef.current = queryString;
 
-      const response = await axiosInstance.get(
-        `/products/filters?${queryString}`,
-        { signal: controller.signal }
-      );
+    
+
+      const response = await axiosInstance.get(`/products/filters?${queryString}`);
       const data = response.data.data;
       setColors(data?.attributes?.colors);
       setProductTypes(data?.productTypes);
@@ -139,10 +132,6 @@ const Sidebar = () => {
       setSize(data?.attributes?.sizes);
       setPrice(data.priceRange);
     } catch (err) {
-      if (err.name === "CanceledError" || err.name === "AbortError") {
-        // Request was canceled, do nothing
-        return;
-      }
       console.error("Failed to fetch filters:", err);
     }
   };
