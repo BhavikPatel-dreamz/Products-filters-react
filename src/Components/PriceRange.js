@@ -37,16 +37,17 @@ const PriceRangeSlider = (price) => {
   const sliderRef = useRef(null);
   const rangeConfig = { min: price?.price?.min, max: price?.price?.max };
 
-  const minPercent = ((minValue - rangeConfig.min) / (rangeConfig.max - rangeConfig.min)) * 100;
-  const maxPercent = ((maxValue - rangeConfig.min) / (rangeConfig.max - rangeConfig.min)) * 100;
+  const minPercent = Math.min(100, Math.max(0, ((minValue - rangeConfig.min) / (rangeConfig.max - rangeConfig.min)) * 100));
+  const maxPercent = Math.min(100, Math.max(0, ((maxValue - rangeConfig.min) / (rangeConfig.max - rangeConfig.min)) * 100));
 
+  
   // Function to get URL parameters
   const getUrlParams = () => {
     const url = new URL(window.location.href);
     const params = url.searchParams;
     const minPrice = params.get('minPrice');
     const maxPrice = params.get('maxPrice');
-    
+
     return {
       minPrice: minPrice ? parseFloat(minPrice) : null,
       maxPrice: maxPrice ? parseFloat(maxPrice) : null
@@ -57,7 +58,7 @@ const PriceRangeSlider = (price) => {
   const hasNonPriceFilters = () => {
     const params = new URLSearchParams(location.search);
     const allParams = Array.from(params.keys());
-    const nonPriceParams = allParams.filter(param => 
+    const nonPriceParams = allParams.filter(param =>
       param !== 'minPrice' && param !== 'maxPrice' && param !== 'collections'
     );
     return nonPriceParams.length > 0;
@@ -66,7 +67,7 @@ const PriceRangeSlider = (price) => {
   // Function to update URL and trigger navigation
   const updateUrlAndNavigate = (newMinValue, newMaxValue) => {
     const searchParams = new URLSearchParams(location.search);
-    
+
     // Only set price params if they differ from the default range
     if (newMinValue !== price.price.min || newMaxValue !== price.price.max) {
       searchParams.set('minPrice', newMinValue);
@@ -87,22 +88,22 @@ const PriceRangeSlider = (price) => {
   useEffect(() => {
     if (price?.price?.min !== undefined && price?.price?.max !== undefined) {
       const urlParams = getUrlParams();
-      
+
       // Check if we should reset to default (when other filters are applied)
       if (hasNonPriceFilters() && !urlParams.minPrice && !urlParams.maxPrice) {
         setShouldResetToDefault(true);
       } else {
         setShouldResetToDefault(false);
       }
-      
+
       // Use URL params if available, otherwise use default price range
       const initialMin = urlParams.minPrice !== null ? urlParams.minPrice : price.price.min;
       const initialMax = urlParams.maxPrice !== null ? urlParams.maxPrice : price.price.max;
-      
+
       // Set display range and store range
       dispatch(setDisplayRange({ min: initialMin, max: initialMax }));
       dispatch(setRange({ min: initialMin, max: initialMax }));
-      
+
       // Update local state
       setMinValue(initialMin);
       setMaxValue(initialMax);
@@ -143,7 +144,7 @@ const PriceRangeSlider = (price) => {
     const handleUp = () => {
       setIsDragging(null);
       dispatch(setDisplayRange({ min: minValue, max: maxValue }));
-    
+
       // Update URL using React Router navigation instead of direct history manipulation
       updateUrlAndNavigate(minValue, maxValue);
     };
