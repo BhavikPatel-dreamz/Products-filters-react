@@ -94,7 +94,18 @@ const Sidebar = () => {
       if (collectionName) {
         queryParams.set("collections", collectionName);
       }
-      
+
+      //remove page from query params if it exists
+      queryParams.delete("page");
+
+      // Check if sort is present in searchParams and add it to queryParams
+      const sort = searchParams.get("sort");
+      if (sort) {
+        queryParams.set("sort", sort);
+      }
+
+    
+
       // Create the final query string
       const queryString = queryParams.toString();
       
@@ -105,6 +116,8 @@ const Sidebar = () => {
       
       // Update the ref with current query string
       lastQueryStringRef.current = queryString;
+
+    
 
       const response = await axiosInstance.get(`/products/filters?${queryString}`);
       const data = response.data.data;
