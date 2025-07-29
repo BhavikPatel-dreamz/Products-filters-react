@@ -71,7 +71,7 @@ const Sidebar = () => {
     }
 
     setEnabledFilterConfigs(filteredConfigs);
-  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work,price]);
+  }, [gender, productGroup, productTypes, colors, productBrand, productMaterial, fabrics, size, work, price]);
 
   const fetchFilters = async () => {
     try {
@@ -104,20 +104,20 @@ const Sidebar = () => {
         queryParams.set("sort", sort);
       }
 
-    
+
 
       // Create the final query string
       const queryString = queryParams.toString();
-      
+
       // Check if this is the same query as the last one
       if (lastQueryStringRef.current === queryString) {
         return; // Don't make the API call if it's the same query
       }
-      
+
       // Update the ref with current query string
       lastQueryStringRef.current = queryString;
 
-    
+
 
       const response = await axiosInstance.get(`/products/filters?${queryString}`);
       const data = response.data.data;
@@ -222,7 +222,6 @@ const Sidebar = () => {
             price={price}
           />
         ))}
-
     </>
   );
 };

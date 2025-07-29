@@ -5482,6 +5482,7 @@ shopify-payment-terms {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 .t4s-active-filters > *:not(:last-child) {
   padding-inline-start: 15px;

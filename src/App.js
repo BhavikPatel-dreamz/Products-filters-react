@@ -163,6 +163,29 @@ const Layout = ({ children }) => {
             <form id="FacetFiltersForm" data-sidebar-links="" className="t4s-facets__form t4s-g-0">
               <Sidebar />
             </form>
+            {isMobile && (
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
+                <button
+                  onClick={closeDrawer}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#4F46E5", // Indigo
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#4338CA")}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4F46E5")}
+                >
+                  Apply
+                </button>
+              </div>
+
+            )}
           </div>
         )}
         

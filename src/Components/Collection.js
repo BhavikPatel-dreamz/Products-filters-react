@@ -144,9 +144,7 @@ const Collection = ({ sort }) => {
             <SelectedFilters />
             <div className="t4s_box_pr_grid t4s-products  t4s-text-default t4s_rationt  t4s_position_8 t4s_cover t4s-row  t4s-justify-content-center t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-md-15 t4s-gy-md-15 t4s-gx-10 t4s-gy-10">
                 {loading ? (
-                    Array.from({ length: Number(paginationData.limit) || 10 }).map((_, index) => (
-                        <ProductCardSkeleton key={index} />
-                    ))
+                    <span class="lazyloadt4s-loader active"></span>
                 ) : products.length === 0 ? (
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
