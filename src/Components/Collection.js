@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import PaginationComponent from "./pagination";
 import ProductItem from "./ProductItem";
 import SelectedFilters from "./SlectedFilter";
-import ProductCardSkeleton from "./ProductSkeleton";
 
 const Collection = ({ sort }) => {
     const collectionElement = document.getElementById("collection");
