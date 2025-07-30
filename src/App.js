@@ -193,40 +193,6 @@ const Layout = ({ children }) => {
           {children({ sort })}
         </div>
       </div>
-
-      <style>{`
-        .drawer-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          z-index: 998;
-        }
-        
-        @media (min-width: 768px) {
-          .drawer-overlay {
-            display: none !important;
-          }
-          
-          .t4s-filter-area {
-            position: static !important;
-            transform: none !important;
-            width: auto !important;
-            height: auto !important;
-            box-shadow: none !important;
-            z-index: auto !important;
-            padding: 0 !important;
-          }
-        }
-        
-        @media (max-width: 767px) {
-          .t4s-filter-area.drawer-open {
-            display: block !important;
-          }
-        }
-      `}</style>
     </>
   );
 };
