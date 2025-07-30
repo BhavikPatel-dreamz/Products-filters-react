@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import parse from 'html-react-parser';
 
-const ProductItem = ({ product }) => {
+const ProductItem = ({ product ,loadingData}) => {
   const [loading, setLoading] = useState(false);
   const handleImageClick = (product) => {
     window.location.href = `${product.productUrl}`;
@@ -58,6 +58,10 @@ const ProductItem = ({ product }) => {
                 alt={product.name}
                 className="t4s-product-main-img lazyautosizes lazyloadt4sed"
               />
+              
+           
+                <span className={`lazyloadt4s-loader ${loadingData && "active"}`}></span>
+              
               <img
                 src={`${product?.images?.[1]?.url}?width=350&height=452`}
                 alt={product?.name}

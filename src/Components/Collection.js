@@ -148,7 +148,7 @@ const Collection = ({ sort }) => {
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
                     products.map((product, i) => (
-                        <ProductItem key={i} product={product} />
+                        <ProductItem key={i} product={product} loadingData={loading}/>
                     ))
                 )}
             </div>
