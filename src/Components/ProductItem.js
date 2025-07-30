@@ -4,7 +4,8 @@ import parse from 'html-react-parser';
 
 const ProductItem = ({ product, loadingData }) => {
   const [loading, setLoading] = useState(false);
-  
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   const handleImageClick = (product) => {
     if (!loadingData && product) {
       window.location.href = `${product.productUrl}`;
@@ -14,7 +15,7 @@ const ProductItem = ({ product, loadingData }) => {
   function get_currency(price) {
     const rate = window.Shopify?.currency?.rate || 1;
     const formatMoney = window.BOLD?.common?.Shopify?.formatMoney;
-    const currency = window?.BOLD?.common?.Shopify?.cart?.currency
+    const currency = window?.BOLD?.common?.Shopify?.cart?.currency;
     if (typeof formatMoney !== 'function') {
       console.warn('formatMoney function is not available.');
       return ((price * 100) * rate).toFixed(2);
@@ -24,28 +25,23 @@ const ProductItem = ({ product, loadingData }) => {
 
   const addToCart = (variant) => {
     if (typeof window?.addCart !== "function") {
-      return null
-    }
-    else {
+      return null;
+    } else {
       setLoading(true);
       return window?.addCart(variant)
         .finally(() => {
           setLoading(false);
         });
     }
-  }
+  };
 
-  // Generate the price HTML string
   const getPriceHTML = () => {
-    
-    
     let html = '<span class="price dib mb__5">';
     if (product?.compareAtPrice) {
       html += `<del>${get_currency(product.compareAtPrice)}</del>`;
     }
     html += `<ins>${get_currency(product.price)}</ins>`;
     html += '</span>';
-
     return html;
   };
 
@@ -59,9 +55,9 @@ const ProductItem = ({ product, loadingData }) => {
               className="t4s-product-img t4s_ratio is-show-img2"
               data-style="--aspect-ratioapt: 0.75"
             >
-              <div className="skeleton-img" style={{ 
-                width: '100%', 
-                height: '100%', 
+              <div className="skeleton-img" style={{
+                width: '100%',
+                height: '100%',
                 backgroundColor: '#f0f0f0',
                 display: 'flex',
                 alignItems: 'center',
@@ -76,7 +72,6 @@ const ProductItem = ({ product, loadingData }) => {
     );
   }
 
-  // Render actual product
   return (
     <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-pr-6716638691523 t4s-col-item is-t4s-pr-created">
       <div className="t4s-product-wrapper">
@@ -90,15 +85,17 @@ const ProductItem = ({ product, loadingData }) => {
               src={`${product?.imageUrl}?width=350&height=452`}
               alt={product?.name}
               className="t4s-product-main-img lazyautosizes lazyloadt4sed"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageLoaded(true)}
             />
-            <span className="lazyloadt4s-loader"></span>
+            <span className={`lazyloadt4s-loader ${!imageLoaded ? 'active' : ''}`}></span>
             <img
               src={`${product?.images?.[1]?.url}?width=350&height=452`}
               alt={product?.name}
               className="t4s-product-hover-img lazyautosizes lazyloadt4sed"
             />
           </div>
-            
+
           {product?.compareAtPrice && (
             <div className="t4s-product-badge">
               <span className="t4s-badge-item t4s-badge-sale">
@@ -108,7 +105,7 @@ const ProductItem = ({ product, loadingData }) => {
           )}
 
           <div className="custom-atc-grid t4s-product-btns">
-            {(product?.variants?.length === 1) ? 
+            {(product?.variants?.length === 1) ?
               <button
                 data-animation-atc='{"ani":"none","time":3000}'
                 type="submit"
@@ -212,29 +209,30 @@ const ProductItem = ({ product, loadingData }) => {
             </a>
           </div>
         </div>
+      </div>
 
-        <div className="t4s-product-info">
-          <div className="t4s-product-info__inner">
-            <div className="t4s-product-vendor">
-              <a href="#">{product?.brand}</a>
-            </div>
+      <div className="t4s-product-info">
+        <div className="t4s-product-info__inner">
+          <div className="t4s-product-vendor">
+            <a href="#">{product?.brand}</a>
+          </div>
 
-            <h3 className="t4s-product-title">
-              <a
-                href={product?.productUrl?.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
-                className="is--href-replaced"
-              >
-                {product?.name}
-              </a>
-            </h3>
+          <h3 className="t4s-product-title">
+            <a
+              href={product?.productUrl?.replace("//trendiaglobalstore.myshopify.com", "//trendia.co")}
+              className="is--href-replaced"
+            >
+              {product?.name}
+            </a>
+          </h3>
 
-            <div className="t4s-product-price">
-              {parse(getPriceHTML())}
-            </div>
+          <div className="t4s-product-price">
+            {parse(getPriceHTML())}
           </div>
         </div>
       </div>
     </div>
+  
   );
 };
 
