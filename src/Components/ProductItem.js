@@ -3,7 +3,6 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import parse from 'html-react-parser';
 
 const ProductItem = ({ product, loadingData }) => {
-
   const [loading, setLoading] = useState(false);
   
   const handleImageClick = (product) => {
@@ -53,7 +52,27 @@ const ProductItem = ({ product, loadingData }) => {
   // Render skeleton/loading state
   if (loadingData) {
     return (
-      <span className="lazyloadt4s-loader active"></span>
+      <div className="t4s-product t4s-pr-grid t4s-pr-style3 t4s-pr-6716638691523 t4s-col-item is-t4s-pr-created">
+        <div className="t4s-product-wrapper">
+          <div data-cacl-slide className="t4s-product-inner t4s-pr t4s-oh">
+            <div
+              className="t4s-product-img t4s_ratio is-show-img2"
+              data-style="--aspect-ratioapt: 0.75"
+            >
+              <div className="skeleton-img" style={{ 
+                width: '100%', 
+                height: '100%', 
+                backgroundColor: '#f0f0f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <span className="lazyloadt4s-loader active"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
