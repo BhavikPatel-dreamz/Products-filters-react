@@ -14,6 +14,8 @@ const Collection = ({ sort }) => {
     const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [hasFetchedOnce, setHasFetchedOnce] = useState(false);
+
     const urlPage = Number(searchParams.get("page")) || 1;
 
     const [paginationData, setPaginationData] = useState({
@@ -42,7 +44,6 @@ const Collection = ({ sort }) => {
                 baseFilters[key] = value.includes(",") ? value.split(",") : value;
             }
         }
-        // Only add collection filter if collectionName is provided
         if (collectionName) {
             baseFilters.collections = collectionName;
         }
@@ -60,7 +61,6 @@ const Collection = ({ sort }) => {
 
         if (filtersChanged) {
             lastFiltersRef.current = { ...filters };
-
             const newParams = new URLSearchParams(searchParams.toString());
             newParams.set("page", "1");
             navigate(`?${newParams.toString()}`, { replace: true });
@@ -79,13 +79,10 @@ const Collection = ({ sort }) => {
         if (sort && currentSort !== sort) {
             const newParams = new URLSearchParams(searchParams.toString());
             newParams.set("sort", sort);
-            // Reset to page 1 when sort changes
             newParams.set("page", "1");
             navigate(`?${newParams.toString()}`, { replace: true });
         }
     }, [sort, searchParams, navigate]);
-
-
 
     const fetchData = useCallback(async () => {
         const queryParams = new URLSearchParams();
@@ -95,11 +92,9 @@ const Collection = ({ sort }) => {
         queryParams.set("page", urlPage.toString());
         queryParams.set("limit", paginationData.limit);
         if (sort) queryParams.set("sort", sort);
-        if (collectionName) {
-            queryParams.set("collections", collectionName);
-        }
-        const queryString = queryParams.toString();
+        if (collectionName) queryParams.set("collections", collectionName);
 
+        const queryString = queryParams.toString();
         if (lastFetchParamsRef.current === queryString) return;
         lastFetchParamsRef.current = queryString;
 
@@ -120,16 +115,14 @@ const Collection = ({ sort }) => {
         } catch (err) {
             console.error("Error fetching products:", err);
         } finally {
+            setHasFetchedOnce(true);
             setLoading(false);
         }
     }, [filters, urlPage, sort, collectionName, paginationData.limit]);
 
-
-    // Create a dependency string for the fetch effect
     useEffect(() => {
         fetchData();
     }, [fetchData]);
-
 
     const changePage = (newPage) => {
         const newParams = new URLSearchParams(searchParams.toString());
@@ -137,28 +130,34 @@ const Collection = ({ sort }) => {
         navigate(`?${newParams.toString()}`, { replace: true });
     };
 
+    // Create skeleton items for loading state
+    const renderSkeletonItems = () => {
+        const skeletonCount = paginationData.limit || 8; // Show skeleton items based on limit
+        return Array.from({ length: skeletonCount }, (_, index) => (
+            <ProductItem key={`skeleton-${index}`} loadingData={true} />
+        ));
+    };
 
     return (
         <div>
             <SelectedFilters />
-            <div className="t4s_box_pr_grid t4s-products  t4s-text-default t4s_rationt  t4s_position_8 t4s_cover t4s-row  t4s-justify-content-center t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-md-15 t4s-gy-md-15 t4s-gx-10 t4s-gy-10">
+            <div className="t4s_box_pr_grid t4s-products t4s-text-default t4s_rationt t4s_position_8 t4s_cover t4s-row t4s-justify-content-center t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-md-15 t4s-gy-md-15 t4s-gx-10 t4s-gy-10">
                 {loading ? (
-                    <span class="lazyloadt4s-loader active"></span>
-                ) : products.length === 0 ? (
+                    renderSkeletonItems()
+                ) : hasFetchedOnce && products.length === 0 ? (
                     <div className="w__100 tc mt__40 fwm fs__16">No products available.</div>
                 ) : (
                     products.map((product, i) => (
-                        <ProductItem key={i} product={product} loadingData={loading}/>
+                        <ProductItem key={i} product={product} loadingData={false} />
                     ))
                 )}
             </div>
 
-
-            {showPagination && paginationData.pages > 1 && products.length > 0 && (
+            {showPagination && paginationData.pages > 1 && products.length > 0 && !loading && (
                 <PaginationComponent
                     currentPage={paginationData.page}
                     totalPages={paginationData.pages}
-                    onPageChange={changePage} 
+                    onPageChange={changePage}
                 />
             )}
         </div>
