@@ -23,10 +23,26 @@ import "./index.css"
 // );
 
 
-const collectionElement = document.getElementById("collection");
-const basePath = collectionElement?.dataset?.basePath || "/"; 
+const mountEl =
+  document.getElementById("collection") || document.getElementById("root");
 
-const root = ReactDOM.createRoot(collectionElement);
+if (!mountEl) {
+  // Fail loudly instead of silently showing a white screen.
+  throw new Error('React mount element not found. Expected #collection or #root.');
+}
+
+const configuredBasePath = mountEl.dataset?.basePath || "/";
+const normalizedBasePath = configuredBasePath.startsWith("/")
+  ? configuredBasePath
+  : `/${configuredBasePath}`;
+
+// If the configured basename doesn't match the current URL (common in local dev),
+// fall back to "/" so the router can render instead of showing a blank screen.
+const basePath = window.location.pathname.startsWith(normalizedBasePath)
+  ? normalizedBasePath
+  : "/";
+
+const root = ReactDOM.createRoot(mountEl);
 root.render(
   <React.StrictMode>
     <BrowserRouter

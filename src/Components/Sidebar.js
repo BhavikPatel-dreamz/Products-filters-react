@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import axiosInstance from "../axiosinstance";
+import axiosInstance from "../service/axiosinstance";
 import FilterSection from "./Filtersidebar";
 
 const Sidebar = () => {
@@ -116,8 +116,6 @@ const Sidebar = () => {
 
       // Update the ref with current query string
       lastQueryStringRef.current = queryString;
-
-
 
       const response = await axiosInstance.get(`/products/filters?${queryString}`);
       const data = response.data.data;
