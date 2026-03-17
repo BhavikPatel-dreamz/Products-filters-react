@@ -16,7 +16,6 @@ const Dropdown = ({ setSort }) => {
   const [selectedValue, setSelectedValue] = useState("");
   const [selectedKey, setSelectedKey] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
-  // const dropdownRef = useRef(null);
 
   const handleSelectItem = (label, sortValue) => {
     setSelectedValue(label);
@@ -42,17 +41,6 @@ const Dropdown = ({ setSort }) => {
       }
     }
   }, [searchParams, setSort]);
-
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-  //       setIsOpen(false);
-  //     }
-  //   };
-  
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, []);
   
   return (
     <div  className={`t4s-dropdown t4s-dropdown__sortby t4s-col-item t4s-col-md-6 t4s-col-6`}>
