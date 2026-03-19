@@ -26,6 +26,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && node scripts/postbuild-rename.js",
+    "build-server": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
