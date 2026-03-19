@@ -10,7 +10,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import PaginationComponent from "./pagination";
 import ProductItem from "./ProductItem";
 import SelectedFilters from "./SlectedFilter";
-import {getAllFilterProducts} from "../service/api"
 
 const Collection = ({ sort }) => {
   const collectionElement = document.getElementById("collection");
@@ -21,6 +20,7 @@ const Collection = ({ sort }) => {
 
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
+  const [recProduct,setRecProduct] = useState(0)
   const [loading, setLoading] = useState(false);
   const [hasFetchedOnce, setHasFetchedOnce] = useState(false);
 
@@ -109,12 +109,15 @@ const Collection = ({ sort }) => {
 
     setLoading(true);
     setProducts([]);
+    setRecProduct(0)
     const userId = localStorage.getItem("user_id");
     try {
       // const viewProducts = await viewedProducts(userId);
       // console.log(viewProducts.data.products);
 
-      const response = await axiosInstance.get(`/products/get/${userId}?${queryString}`);
+      const response = await axiosInstance.get(
+        `/products/get/${userId}?${queryString}`,
+      );
 
       if (response.data?.data) {
         // const viewed = viewProducts?.data?.products || [];
@@ -123,7 +126,7 @@ const Collection = ({ sort }) => {
         // const mergedProducts = [...products];
 
         setProducts(products);
-
+        setRecProduct(response?.data?.data?.recProductCount || 0)
         setPaginationData((prev) => ({
           ...prev,
           ...response.data.data.pagination,
@@ -157,9 +160,34 @@ const Collection = ({ sort }) => {
     ));
   };
 
+  const isFirstPage = paginationData.page === 1;
+
+  const recommendedProducts = useMemo(() => {
+    if (!isFirstPage) return [];
+    return products.slice(0,recProduct);
+  }, [products, isFirstPage,recProduct]);
+
+  const remainingProducts = useMemo(() => {
+    if (!isFirstPage) return products;
+    return products.slice(recProduct);
+  }, [products, isFirstPage,recProduct]);
+
   return (
     <div>
       <SelectedFilters />
+      {isFirstPage && recommendedProducts.length > 0 && (
+        <div
+          className="recommended-wrapper"
+        >
+          <h3 className="recommended-header">Recommended Products</h3>
+
+          <div className="t4s_box_pr_grid t4s-products t4s-row t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-10 t4s-gy-10">
+            {recommendedProducts.map((product, i) => (
+              <ProductItem key={`rec-${i}`} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
       <div className="t4s_box_pr_grid t4s-products t4s-text-default t4s_rationt t4s_position_8 t4s_cover t4s-row t4s-justify-content-center t4s-row-cols-2 t4s-row-cols-md-2 t4s-row-cols-lg-4 t4s-gx-md-15 t4s-gy-md-15 t4s-gx-10 t4s-gy-10">
         {loading ? (
           renderSkeletonItems()
@@ -168,7 +196,7 @@ const Collection = ({ sort }) => {
             No products available.
           </div>
         ) : (
-          products.map((product, i) => (
+          (isFirstPage ? remainingProducts : products).map((product, i) => (
             <ProductItem key={i} product={product} loadingData={false} />
           ))
         )}

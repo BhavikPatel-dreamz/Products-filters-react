@@ -229,6 +229,7 @@ const App = () => {
       const sessionId = sessionStorage.getItem("session_id");
       const userId = localStorage.getItem("user_id");
 
+
       if (sessionId && userId) return;
 
       let currentUserId = userId;

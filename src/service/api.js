@@ -1,5 +1,4 @@
 import axiosInstance from "./axiosinstance";
-import toast from "react-hot-toast";
 
 export const createUser = async (data) => {
   try {
