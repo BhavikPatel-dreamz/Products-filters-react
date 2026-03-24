@@ -33,4 +33,16 @@ export const createEvent = async (data) => {
   }
 };
 
+export const featchSimilarProduct = async (productId,userId)=>{
+  try {
+    const res = await axiosInstance.post(`/similar/${productId}`,{userId});
+    return res;
+  } catch (error) {
+    const errorMessage =
+      error.response.data.message || error.message || "featch SimilarProduct Error";
+    console.log(errorMessage);
+  }
+}
+
+
 

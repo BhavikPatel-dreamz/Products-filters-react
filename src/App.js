@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import store from "./Redux/Slices/store";
 import { Toaster } from "react-hot-toast";
 import { ensureUser, ensureSession } from "./utils/userAndSession";
+import ProductDetailPage from "./pages/ProductDetail";
 
 const Layout = ({ children }) => {
   const [sort, setSort] = useState("");
@@ -270,6 +271,7 @@ const App = () => {
           path="/"
           element={<Layout>{({ sort }) => <Collection sort={sort} />}</Layout>}
         />
+       <Route path="/product/:id" element={<ProductDetailPage />} />
       </Routes>
     </Provider>
   );

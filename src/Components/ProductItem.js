@@ -3,15 +3,20 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import parse from "html-react-parser";
 import { createEvent } from "../service/api";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const ProductItem = ({ product, loadingData }) => {
   const [loading, setLoading] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const navigate = useNavigate();
 
   const handleImageClick = (product) => {
     if (!loadingData && product) {
       // window.location.href = `${product.productUrl}`;
       handleEvents("view_product");
+      navigate(`/product/${product.productId}`, {
+        state: { product }, // ✅ pass full product data
+      });
     }
   };
 
@@ -85,7 +90,12 @@ const ProductItem = ({ product, loadingData }) => {
           <div data-cacl-slide className="t4s-product-inner t4s-pr t4s-oh">
             <div
               className="t4s-product-img t4s_ratio is-show-img2"
-              data-style="--aspect-ratioapt: 0.75"
+              style={{
+                width: "100%",
+                aspectRatio: "4 / 5",
+                overflow: "hidden",
+                position: "relative",
+              }}
             >
               <div
                 className="skeleton-img"
@@ -263,8 +273,13 @@ const ProductItem = ({ product, loadingData }) => {
               rel="nofollow"
               className="t4s-pr-item-btn t4s-pr-quickview t4s-tooltip-actived"
               data-action-quickview=""
-              aria-describedby=""
-              onClick={() => handleEvents("view_product")}
+              onClick={() => {
+                handleEvents("view_product");
+
+                navigate(`/product/${product.productId}`, {
+                  state: { product },
+                });
+              }}
             >
               <span className="t4s-svg-pr-icon">
                 <svg
@@ -301,6 +316,9 @@ const ProductItem = ({ product, loadingData }) => {
           className="t4s-product-info__inner"
           onClick={() => {
             handleEvents("view_product");
+            navigate(`/product/${product.productId}`, {
+              state: { product },
+            });
           }}
         >
           <div className="t4s-product-vendor">
@@ -308,9 +326,7 @@ const ProductItem = ({ product, loadingData }) => {
           </div>
 
           <h3 className="t4s-product-title">
-            <p>
-              {product?.name}
-            </p>
+            <p>{product?.name}</p>
           </h3>
 
           <div className="t4s-product-price">{parse(getPriceHTML())}</div>

@@ -375,6 +375,17 @@ ol, ul {
     --li-pl: 17px;
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
 .recommended-wrapper {
   background: #fff5f5;
   border: 1px solid #ff4d4f;
